@@ -6,6 +6,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+          channel: 'stable'
       - run: flutter --version
       - name: Dart Apply Fixes (if this fails, run `dart fix --apply` locally)
         run: dart fix --apply; git diff --exit-code

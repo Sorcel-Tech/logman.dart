@@ -20,21 +20,15 @@ class Logman {
   void _addRecord(LogmanRecord record) =>
       _records.value = [..._records.value, record];
 
-  void _clearRecords() => _records.value = [];
+  void addSimpleRecord(String message) {
+    _addRecord(SimpleLogmanRecord(message));
+    _logger.i(message);
+  }
 
-  void _removeRecord(LogmanRecord record) =>
-      _records.value = _records.value.where((r) => r != record).toList();
-
-  void _removeRecordAt(int index) =>
-      _records.value = _records.value..removeAt(index);
-
-  void _removeRecordsAt(List<int> indexes) => _records.value = _records.value
-    ..removeWhere((r) => indexes.contains(_records.value.indexOf(r)));
-
-  void addSimpleRecord(String message) =>
-      _addRecord(SimpleLogmanRecord(message));
-
-  void addNavigationRecord(NavigationLogmanRecord record) => _addRecord(record);
+  void addNavigationRecord(NavigationLogmanRecord record) {
+    _addRecord(record);
+    _logger.i(record);
+  }
 
   void attachOverlay({
     required BuildContext context,
