@@ -48,23 +48,22 @@ class LogmanDioInterceptor extends Interceptor {
   }
 
   @override
-  void onError(DioException exception, ErrorInterceptorHandler handler) {
-    final Map<String, String>? responseHeaders =
-        exception.response?.headers.map.map(
+  void onError(DioException err, ErrorInterceptorHandler handler) {
+    final Map<String, String>? responseHeaders = err.response?.headers.map.map(
       (key, value) => MapEntry(key, value.join(', ')),
     );
 
     final requestRecord = NetworkRequestLogmanRecord(
-      url: exception.requestOptions.uri.toString(),
-      method: exception.requestOptions.method,
-      headers: exception.requestOptions.headers,
-      body: exception.requestOptions.data,
+      url: err.requestOptions.uri.toString(),
+      method: err.requestOptions.method,
+      headers: err.requestOptions.headers,
+      body: err.requestOptions.data,
     );
 
     final responseRecord = NetworkResponseLogmanRecord(
-      statusCode: exception.response?.statusCode ?? 0,
+      statusCode: err.response?.statusCode ?? 0,
       headers: responseHeaders,
-      body: exception.response?.data,
+      body: err.response?.data,
     );
 
     _logman.recordNetwork(NetworkLogmanRecord(
@@ -72,6 +71,6 @@ class LogmanDioInterceptor extends Interceptor {
       response: responseRecord,
     ));
 
-    return super.onError(exception, handler);
+    return super.onError(err, handler);
   }
 }
