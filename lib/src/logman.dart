@@ -43,9 +43,28 @@ class Logman {
     _logger.i(record);
   }
 
-  void recordNetwork(NetworkLogmanRecord record) {
-    _addRecord(record);
-    _logger.i(record);
+  void recordNetworkRequest(NetworkRequestLogmanRecord netWorkRequest) {
+    _addRecord(NetworkLogmanRecord(request: netWorkRequest));
+    _logger.i(netWorkRequest.toReadableString());
+  }
+
+  void recordNetworkResponse(NetworkResponseLogmanRecord record) {
+    final records = List<LogmanRecord>.from(_records.value);
+    final index = records.indexWhere((element) {
+      if (element is NetworkLogmanRecord) {
+        return element.request.id == record.id;
+      }
+      return false;
+    });
+    if (index != -1) {
+      final networkRecord = NetworkLogmanRecord(
+        request: (records[index] as NetworkLogmanRecord).request,
+        response: record,
+      );
+      records[index] = networkRecord;
+      _records.value = records;
+      _logger.i(networkRecord.toReadableString());
+    }
   }
 
   void attachOverlay({

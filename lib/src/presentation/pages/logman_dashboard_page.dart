@@ -13,7 +13,8 @@ class LogmanDashboardPage extends StatelessWidget {
     required Logman logman,
     Widget? debugPage,
   }) {
-    return Navigator.of(context).push(
+    return Navigator.push(
+      context,
       MaterialPageRoute<dynamic>(
         builder: (_) => LogmanDashboardPage(
           logman: logman,

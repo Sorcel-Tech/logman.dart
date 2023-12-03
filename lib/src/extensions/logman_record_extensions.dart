@@ -4,10 +4,10 @@ import 'package:logman/logman.dart';
 
 extension NetworkLogmanRecordExtensions on NetworkLogmanRecord {
   String get durationInMs {
-    if (request.sentAt == null || response.receivedAt == null) {
+    if (request.sentAt == null || response?.receivedAt == null) {
       return '0 ms';
     }
-    return '${response.receivedAt!.difference(request.sentAt!).inMilliseconds} ms';
+    return '${response?.receivedAt!.difference(request.sentAt!).inMilliseconds} ms';
   }
 }
 

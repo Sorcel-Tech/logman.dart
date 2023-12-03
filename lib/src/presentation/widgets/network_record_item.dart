@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:logman/logman.dart';
+import 'package:logman/src/presentation/presentation.dart';
 
 class NetworkRecordItem extends StatelessWidget {
   final NetworkLogmanRecord record;
@@ -17,14 +19,18 @@ class NetworkRecordItem extends StatelessWidget {
       leading: _buildStatusIcon(),
       title: _buildTitle(),
       subtitle: _buildSubtitle(),
-      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+      trailing: record.response == null
+          ? const CupertinoActivityIndicator()
+          : const Icon(Icons.chevron_right, color: Colors.grey),
     );
   }
 
-  void _navigateToDetails(BuildContext context) {}
+  void _navigateToDetails(BuildContext context) {
+    NetworkRecordDetailsPage.push(context: context, record: record);
+  }
 
   Widget _buildStatusIcon() {
-    final statusCode = record.response.statusCode;
+    final statusCode = record.response?.statusCode;
 
     IconData icon;
     Color color;
@@ -66,7 +72,9 @@ class NetworkRecordItem extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(top: 4.0),
           child: Text(
-            '${record.timeFormatted} • ${record.durationInMs} • ${record.response.sizeInKb}',
+            record.response == null
+                ? record.timeFormatted
+                : '${record.timeFormatted} • ${record.durationInMs} • ${record.response?.sizeInKb}',
             style: const TextStyle(fontSize: 14.0, color: Colors.grey),
           ),
         ),

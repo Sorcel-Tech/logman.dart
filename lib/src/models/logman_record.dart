@@ -56,12 +56,18 @@ class NavigationLogmanRecord extends LogmanRecord {
 
 class NetworkLogmanRecord extends LogmanRecord {
   final NetworkRequestLogmanRecord request;
-  final NetworkResponseLogmanRecord response;
+  final NetworkResponseLogmanRecord? response;
 
   NetworkLogmanRecord({
     required this.request,
-    required this.response,
+    this.response,
   }) : super(LogmanRecordType.network);
+
+  String get id => request.id;
+
+  String toReadableString() {
+    return 'NetworkLogmanRecord{request: ${request.toReadableString()}, response: ${response?.toReadableString()}}';
+  }
 
   @override
   String toString() {
@@ -70,6 +76,7 @@ class NetworkLogmanRecord extends LogmanRecord {
 }
 
 class NetworkRequestLogmanRecord {
+  final String id;
   final String url;
   final String method;
   final Map<String, dynamic>? headers;
@@ -77,26 +84,37 @@ class NetworkRequestLogmanRecord {
   final DateTime? sentAt;
 
   const NetworkRequestLogmanRecord({
+    required this.id,
     required this.url,
     required this.method,
     required this.headers,
     this.body,
     this.sentAt,
   });
+
+  String toReadableString() {
+    return 'NetworkRequestLogmanRecord{url: $url, method: $method, headers: $headers, body: $body, sentAt: $sentAt}';
+  }
 }
 
 class NetworkResponseLogmanRecord {
+  final String id;
   final int? statusCode;
   final Map<String, String>? headers;
   final Object? body;
   final DateTime? receivedAt;
 
   NetworkResponseLogmanRecord({
+    required this.id,
     required this.statusCode,
     required this.headers,
     required this.body,
     this.receivedAt,
   });
+
+  String toReadableString() {
+    return 'NetworkResponseLogmanRecord{statusCode: $statusCode, headers: $headers, body: $body, receivedAt: $receivedAt}';
+  }
 }
 
 enum NavigationAction {

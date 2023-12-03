@@ -29,16 +29,16 @@ class _MyAppState extends State<MyApp> {
       valueListenable: isDarkModeNotifier,
       builder: (context, isDarkMode, child) {
         return MaterialApp(
-          title: 'Flutter Demo',
+          title: 'Logman Demo',
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.deepPurple,
+              seedColor: Colors.blue.shade900,
               brightness: isDarkMode ? Brightness.dark : Brightness.light,
             ),
             useMaterial3: true,
             brightness: isDarkMode ? Brightness.dark : Brightness.light,
           ),
-          home: const MyHomePage(title: 'Flutter Demo Home Page'),
+          home: const MyHomePage(title: 'Logman Demo Home Page'),
           navigatorObservers: [
             LogmanNavigatorObserver(),
           ],

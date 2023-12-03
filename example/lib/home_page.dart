@@ -15,22 +15,22 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final Dio dio = Dio(
-    BaseOptions(
-      baseUrl: 'https://jsonplaceholder.typicode.com',
-    ),
-  )..interceptors.add(LogmanDioInterceptor());
+  final Dio dio = Dio()..interceptors.add(LogmanDioInterceptor());
   List<PostModel> posts = [];
   final logman = Logman.instance;
 
   Future<void> mockNetworkCallFailure() async {
     try {
-      await dio.get('/error');
-    } catch (e) {}
+      await dio.get(
+          'https://jobs.github.com/positions.json?description=api&location=new+york');
+    } catch (e) {
+      logman.recordSimpleLog(e.toString());
+    }
   }
 
   Future<void> getItems() async {
-    final response = await dio.get('/posts');
+    final response =
+        await dio.get('https://jsonplaceholder.typicode.com/posts');
     final items = response.data as List<dynamic>;
     posts = items.map((element) => PostModel.fromJson(element)).toList();
     setState(() {});

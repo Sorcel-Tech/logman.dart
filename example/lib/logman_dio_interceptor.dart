@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:logman/logman.dart';
 
 class LogmanDioInterceptor extends Interceptor {
@@ -6,12 +7,23 @@ class LogmanDioInterceptor extends Interceptor {
 
   LogmanDioInterceptor();
 
-  final _cache = <RequestOptions, DateTime>{};
+  final _cache = <RequestOptions, String>{};
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    _cache[options] = DateTime.now();
-    _logman.recordSimpleLog('Request sent to ${options.uri.toString()}');
+    final requestId = UniqueKey().toString();
+    _cache[options] = requestId;
+    final sentAt = DateTime.now();
+
+    final requestRecord = NetworkRequestLogmanRecord(
+      id: requestId,
+      url: options.uri.toString(),
+      method: options.method,
+      headers: options.headers,
+      body: options.data,
+      sentAt: sentAt,
+    );
+    _logman.recordNetworkRequest(requestRecord);
 
     return super.onRequest(options, handler);
   }
@@ -21,28 +33,18 @@ class LogmanDioInterceptor extends Interceptor {
     final Map<String, String> responseHeaders = response.headers.map.map(
       (key, value) => MapEntry(key, value.join(', ')),
     );
-    final sentAt = _cache[response.requestOptions];
+    final id = _cache[response.requestOptions];
     final receivedAt = DateTime.now();
 
-    final requestRecord = NetworkRequestLogmanRecord(
-      url: response.requestOptions.uri.toString(),
-      method: response.requestOptions.method,
-      headers: response.requestOptions.headers,
-      body: response.requestOptions.data,
-      sentAt: sentAt,
-    );
-
     final responseRecord = NetworkResponseLogmanRecord(
+      id: id!,
       statusCode: response.statusCode,
       headers: responseHeaders,
       body: response.data,
       receivedAt: receivedAt,
     );
 
-    _logman.recordNetwork(NetworkLogmanRecord(
-      request: requestRecord,
-      response: responseRecord,
-    ));
+    _logman.recordNetworkResponse(responseRecord);
 
     return super.onResponse(response, handler);
   }
@@ -52,24 +54,16 @@ class LogmanDioInterceptor extends Interceptor {
     final Map<String, String>? responseHeaders = err.response?.headers.map.map(
       (key, value) => MapEntry(key, value.join(', ')),
     );
-
-    final requestRecord = NetworkRequestLogmanRecord(
-      url: err.requestOptions.uri.toString(),
-      method: err.requestOptions.method,
-      headers: err.requestOptions.headers,
-      body: err.requestOptions.data,
-    );
+    final id = _cache[err.requestOptions];
 
     final responseRecord = NetworkResponseLogmanRecord(
+      id: id!,
       statusCode: err.response?.statusCode ?? 0,
       headers: responseHeaders,
       body: err.response?.data,
     );
 
-    _logman.recordNetwork(NetworkLogmanRecord(
-      request: requestRecord,
-      response: responseRecord,
-    ));
+    _logman.recordNetworkResponse(responseRecord);
 
     return super.onError(err, handler);
   }
