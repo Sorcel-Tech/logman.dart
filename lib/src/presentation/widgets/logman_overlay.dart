@@ -6,11 +6,13 @@ import 'package:logman/src/presentation/presentation.dart';
 
 class LogmanOverlay extends StatelessWidget {
   final Widget? button;
+  final Widget? debugPage;
   final Logman logman;
   static late OverlayEntry _overlayEntry;
 
   const LogmanOverlay._({
     this.button,
+    this.debugPage,
     required this.logman,
   });
 
@@ -18,6 +20,7 @@ class LogmanOverlay extends StatelessWidget {
     required BuildContext context,
     required Logman logman,
     Widget? button,
+    Widget? debugPage,
   }) {
     final overlay = Overlay.of(context);
 
@@ -25,6 +28,7 @@ class LogmanOverlay extends StatelessWidget {
       builder: (context) => LogmanOverlay._(
         button: button,
         logman: logman,
+        debugPage: debugPage,
       ),
     );
 
@@ -40,15 +44,17 @@ class LogmanOverlay extends StatelessWidget {
     return _DraggableFAB(
       button: button,
       logman: logman,
+      debugPage: debugPage,
     );
   }
 }
 
 class _DraggableFAB extends StatefulWidget {
   final Widget? button;
+  final Widget? debugPage;
   final Logman logman;
 
-  const _DraggableFAB({this.button, required this.logman});
+  const _DraggableFAB({this.button, required this.logman, this.debugPage});
 
   @override
   State<_DraggableFAB> createState() => _DraggableFABState();
@@ -136,7 +142,11 @@ class _DraggableFABState extends State<_DraggableFAB> {
         isOpened = true;
         setState(() {});
 
-        await LogmanDashboardPage.push(context, logman: logman);
+        await LogmanDashboardPage.push(
+          context,
+          logman: logman,
+          debugPage: widget.debugPage,
+        );
 
         isOpened = false;
         setState(() {});

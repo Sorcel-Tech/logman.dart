@@ -10,12 +10,9 @@ class NavigationRecordItem extends StatelessWidget {
     return ListTile(
       leading: _buildLeadingIcon(record.action),
       title: _buildTitleText(),
-      subtitle: Padding(
-        padding: const EdgeInsets.only(top: 4.0),
-        child: Text(
-          record.timeFormatted,
-          style: const TextStyle(fontSize: 14.0, color: Colors.grey),
-        ),
+      subtitle: Text(
+        record.timeFormatted,
+        style: const TextStyle(fontSize: 14.0, color: Colors.grey),
       ),
     );
   }
@@ -47,7 +44,7 @@ class NavigationRecordItem extends StatelessWidget {
         'Navigation ${record.action.toString().split('.').last}: ${record.route.settings.name}';
     return Text(
       titleText,
-      style: const TextStyle(fontWeight: FontWeight.bold),
+      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0),
     );
   }
 }

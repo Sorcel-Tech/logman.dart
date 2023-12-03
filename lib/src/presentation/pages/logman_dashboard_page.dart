@@ -11,13 +11,16 @@ class LogmanDashboardPage extends StatelessWidget {
   static Future<void> push(
     BuildContext context, {
     required Logman logman,
+    Widget? debugPage,
   }) {
     return Navigator.of(context).push(
       MaterialPageRoute<dynamic>(
         builder: (_) => LogmanDashboardPage(
           logman: logman,
+          debugPage: debugPage,
         ),
         fullscreenDialog: true,
+        settings: const RouteSettings(name: '/logman-dashboard'),
       ),
     );
   }
@@ -33,6 +36,7 @@ class LogmanDashboardPage extends StatelessWidget {
           centerTitle: true,
           bottom: TabBar(
             isScrollable: true,
+            tabAlignment: TabAlignment.center,
             tabs: [
               const Tab(text: 'All'),
               const Tab(text: 'Logs'),
@@ -54,16 +58,14 @@ class LogmanDashboardPage extends StatelessWidget {
         body: ValueListenableBuilder(
           valueListenable: logman.records,
           builder: (context, records, _) {
+            // Reverse the list to show the latest records first
+            records = records.reversed.toList();
             return TabBarView(
               children: [
                 AllRecordsPage(records: records),
                 SimpleRecordsPage(records: records),
-                const Center(
-                  child: Text('Network'),
-                ),
-                const Center(
-                  child: Text('Navigation'),
-                ),
+                NetworkRecordsPage(records: records),
+                NavigationRecordsPage(records: records),
                 if (debugPage != null) debugPage!,
               ],
             );

@@ -8,7 +8,13 @@ class AllRecordsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+    if (records.isEmpty) {
+      return const Center(
+        child: Text('Nothing is recorded yet!'),
+      );
+    }
+
+    return ListView.separated(
       itemCount: records.length,
       itemBuilder: (context, index) {
         final record = records[index];
@@ -20,8 +26,13 @@ class AllRecordsPage extends StatelessWidget {
           return NavigationRecordItem(record: record);
         }
 
+        if (record is NetworkLogmanRecord) {
+          return NetworkRecordItem(record: record);
+        }
+
         return const SizedBox.shrink();
       },
+      separatorBuilder: (context, index) => const CustomDivider(),
     );
   }
 }

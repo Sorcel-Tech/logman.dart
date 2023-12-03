@@ -8,7 +8,22 @@ class SimpleRecordItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(record.message),
+      leading: const Icon(Icons.info_outline),
+      title: Text(
+        record.source,
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0),
+      ),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(record.message),
+          const SizedBox(height: 5),
+          Text(
+            record.timeFormatted,
+            style: const TextStyle(fontSize: 14.0, color: Colors.grey),
+          )
+        ],
+      ),
     );
   }
 }
