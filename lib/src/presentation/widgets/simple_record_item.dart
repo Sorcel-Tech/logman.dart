@@ -21,7 +21,7 @@ class SimpleRecordItem extends StatelessWidget {
           Text(
             record.timeFormatted,
             style: const TextStyle(fontSize: 14.0, color: Colors.grey),
-          )
+          ),
         ],
       ),
     );
