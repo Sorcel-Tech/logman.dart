@@ -14,10 +14,8 @@ A simple yet powerful logging package for Flutter apps with an integrated UI and
 
 ## Screenshots
 
-<img src="docs/screenshots/1.png" width="300">
-<img src="docs/screenshots/2.png" width="300"> 
-<img src="docs/screenshots/3.png" width="300">
-<img src="docs/screenshots/4.png" width="300"> 
+<img src="doc/screenshots/1.png" width="300"> <img src="doc/screenshots/2.png" width="300"> 
+<img src="doc/screenshots/3.png" width="300"> <img src="doc/screenshots/4.png" width="300"> 
 
 
 ## Installation
