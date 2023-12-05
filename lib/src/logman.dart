@@ -76,6 +76,11 @@ class Logman {
   }
 
   /// Attaches a logging overlay to the application UI.
+  ///
+  /// [button] is optional, the default button will be displayed if
+  /// it's not giving
+  /// [debugPage] is also optional, you can see an example of this
+  /// in the example app
   void attachOverlay({
     required BuildContext context,
     Widget? button,
