@@ -68,7 +68,7 @@ final Logman _logman = Logman.instance;
 _logman.recordSimpleLog('test');
 ```
 
-There's a (Dio interceptor ready for use in the example app) [https://github.com/Sorcel-Tech/logman.dart/blob/main/example/lib/logman_dio_interceptor.dart].
+There's a [Dio interceptor ready for use in the example app](https://github.com/Sorcel-Tech/logman.dart/blob/main/example/lib/logman_dio_interceptor.dart).
 Also, Logman ships with a Navigator Observer. You can use it like this in your MaterialApp.
 
 ```dart
