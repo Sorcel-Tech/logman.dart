@@ -185,25 +185,29 @@ class _NetworkRecordDetailsPageState extends State<NetworkRecordDetailsPage>
         const CustomDivider(),
         _NetworkDetailItem(
           title: 'Headers',
-          subtitleWidget: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (final entry in record.response!.headers!.entries)
-                GestureDetector(
-                  onTap: () => entry.value.copyToClipboard(context),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${entry.key}: ',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+          subtitle: 'No headers received with response',
+          subtitleWidget: (record.response?.headers?.isEmpty ?? true)
+              ? null
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (final entry in record.response!.headers!.entries)
+                      GestureDetector(
+                        onTap: () => entry.value.copyToClipboard(context),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${entry.key}: ',
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            Flexible(child: Text(entry.value)),
+                          ],
+                        ),
                       ),
-                      Flexible(child: Text(entry.value)),
-                    ],
-                  ),
+                  ],
                 ),
-            ],
-          ),
         ),
         const CustomDivider(),
         _NetworkDetailItem(
