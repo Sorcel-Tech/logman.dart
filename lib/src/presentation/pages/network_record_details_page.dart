@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:logman/logman.dart';
+import 'package:logman/src/presentation/presentation.dart';
 
-class NetworkRecordDetailsPage extends StatelessWidget {
+class NetworkRecordDetailsPage extends StatefulWidget {
   final NetworkLogmanRecord record;
+
   const NetworkRecordDetailsPage({super.key, required this.record});
 
   static void push({
@@ -19,27 +21,39 @@ class NetworkRecordDetailsPage extends StatelessWidget {
   }
 
   @override
+  State<NetworkRecordDetailsPage> createState() =>
+      _NetworkRecordDetailsPageState();
+}
+
+class _NetworkRecordDetailsPageState extends State<NetworkRecordDetailsPage>
+    with SingleTickerProviderStateMixin {
+  late final _tabController = TabController(length: 2, vsync: this);
+
+  NetworkLogmanRecord get record => widget.record;
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
         title: Text(
-          'Network call details',
+          '${record.request.method} ${Uri.parse(record.request.url).path}',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontSize: 20.0),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.share),
-          ),
-        ],
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'Request'),
+            Tab(text: 'Response'),
+          ],
+        ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16.0),
+      body: TabBarView(
+        controller: _tabController,
         children: [
           _buildRequest(),
-          const SizedBox(height: 16.0),
           _buildResponse(),
         ],
       ),
@@ -47,61 +61,191 @@ class NetworkRecordDetailsPage extends StatelessWidget {
   }
 
   Widget _buildRequest() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    final url = Uri.parse(record.request.url);
+    return ListView(
       children: [
-        Text(
-          'Request',
-          style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+        _NetworkDetailItem(
+          title: 'Method',
+          subtitle: record.request.method,
         ),
-        const SizedBox(height: 10.0),
-        Text(
-          record.request.url,
-          style: const TextStyle(fontSize: 16.0),
+        const CustomDivider(),
+        _NetworkDetailItem(
+          title: 'Base URL',
+          subtitle: url.host,
         ),
-        const SizedBox(height: 10.0),
-        Text(
-          record.request.method,
-          style: const TextStyle(fontSize: 16.0),
+        const CustomDivider(),
+        _NetworkDetailItem(
+          title: 'Endpoint',
+          subtitle: url.path,
         ),
-        const SizedBox(height: 10.0),
-        Text(
-          record.request.headers.toString(),
-          style: const TextStyle(fontSize: 16.0),
+        const CustomDivider(),
+        _NetworkDetailItem(
+          title: 'query parameters',
+          subtitleWidget: url.queryParameters.entries.isEmpty
+              ? null
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (final entry in url.queryParameters.entries)
+                      GestureDetector(
+                        onTap: () => entry.value.copyToClipboard(context),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${entry.key}: ',
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            Text(entry.value),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+          subtitle: 'No query parameters',
         ),
-        const SizedBox(height: 10.0),
-        Text(
-          record.request.body.toString(),
-          style: const TextStyle(fontSize: 16.0),
+        const CustomDivider(),
+        _NetworkDetailItem(
+          title: 'Duration',
+          subtitle: record.durationInMs,
         ),
+        const CustomDivider(),
+        _NetworkDetailItem(
+          title: 'Started',
+          subtitle: record.request.dateFormatted,
+        ),
+        const CustomDivider(),
+        _NetworkDetailItem(
+          title: 'Finished',
+          subtitle: record.response?.dateFormatted ?? '',
+        ),
+        const CustomDivider(),
+        _NetworkDetailItem(
+          title: 'Body',
+          subtitle: record.request.body == null
+              ? 'No body sent with request'
+              : record.request.body.toString(),
+        ),
+        const CustomDivider(),
+        _NetworkDetailItem(
+          title: 'Headers',
+          subtitle: 'No headers sent with request',
+          subtitleWidget: (record.request.headers?.isEmpty ?? true)
+              ? null
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (final entry in record.request.headers!.entries)
+                      GestureDetector(
+                        onTap: () =>
+                            entry.value.toString().copyToClipboard(context),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${entry.key}: ',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(entry.value.toString()),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+        ),
+        const SizedBox(height: 30.0),
       ],
     );
   }
 
   Widget _buildResponse() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    if (record.response == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return ListView(
       children: [
-        Text(
-          'Response',
-          style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+        _NetworkDetailItem(
+          title: 'status',
+          subtitle: record.response?.statusCode.toString(),
         ),
-        const SizedBox(height: 10.0),
-        Text(
-          record.response?.statusCode.toString() ?? 'No response',
-          style: const TextStyle(fontSize: 16.0),
+        const CustomDivider(),
+        _NetworkDetailItem(
+          title: 'Received at',
+          subtitle: record.response?.dateFormatted,
         ),
-        const SizedBox(height: 10.0),
-        Text(
-          record.response?.headers.toString() ?? 'No response',
-          style: const TextStyle(fontSize: 16.0),
+        const CustomDivider(),
+        _NetworkDetailItem(
+          title: 'Bytes received',
+          subtitle: record.response?.sizeInBytes,
         ),
-        const SizedBox(height: 10.0),
-        Text(
-          record.response?.body.toString() ?? 'No response',
-          style: const TextStyle(fontSize: 16.0),
+        const CustomDivider(),
+        _NetworkDetailItem(
+          title: 'Headers',
+          subtitleWidget: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (final entry in record.response!.headers!.entries)
+                GestureDetector(
+                  onTap: () => entry.value.copyToClipboard(context),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${entry.key}: ',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Flexible(child: Text(entry.value)),
+                    ],
+                  ),
+                ),
+            ],
+          ),
         ),
+        const CustomDivider(),
+        _NetworkDetailItem(
+          title: 'Body',
+          subtitle: record.response!.body == null
+              ? 'No body passed with request'
+              : record.response!.body.toString(),
+        ),
+        const SizedBox(height: 30.0),
       ],
+    );
+  }
+}
+
+class _NetworkDetailItem extends StatelessWidget {
+  final String title;
+  final String? subtitle;
+  final Widget? subtitleWidget;
+
+  const _NetworkDetailItem({
+    required this.title,
+    this.subtitle,
+    this.subtitleWidget,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      onTap: subtitleWidget != null
+          ? null
+          : () {
+              if (subtitle != null) subtitle!.copyToClipboard(context);
+            },
+      title: Text(
+        title.toUpperCase(),
+        style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+      ),
+      subtitle: subtitleWidget ??
+          SelectableText(
+            subtitle!,
+            style: const TextStyle(fontSize: 14.0),
+          ),
     );
   }
 }

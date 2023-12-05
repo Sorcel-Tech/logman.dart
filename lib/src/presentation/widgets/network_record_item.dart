@@ -51,7 +51,7 @@ class NetworkRecordItem extends StatelessWidget {
 
   Widget _buildTitle() {
     return Text(
-      record.request.method,
+      '${record.request.method} ${Uri.parse(record.request.url).path}',
       overflow: TextOverflow.ellipsis,
       maxLines: 2,
       style: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.w600),
@@ -74,7 +74,7 @@ class NetworkRecordItem extends StatelessWidget {
           child: Text(
             record.response == null
                 ? record.timeFormatted
-                : '${record.timeFormatted} • ${record.durationInMs} • ${record.response?.sizeInKb}',
+                : '${record.timeFormatted} • ${record.durationInMs}',
             style: const TextStyle(fontSize: 14.0, color: Colors.grey),
           ),
         ),

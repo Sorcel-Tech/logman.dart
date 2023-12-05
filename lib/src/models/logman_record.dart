@@ -92,6 +92,10 @@ class NetworkRequestLogmanRecord {
     this.sentAt,
   });
 
+  String get dateFormatted => sentAt == null
+      ? ''
+      : DateFormat("EEE, MMM d 'at'").add_Hms().format(sentAt!);
+
   String toReadableString() {
     return 'NetworkRequestLogmanRecord{url: $url, method: $method, headers: $headers, body: $body, sentAt: $sentAt}';
   }
@@ -101,7 +105,7 @@ class NetworkResponseLogmanRecord {
   final String id;
   final int? statusCode;
   final Map<String, String>? headers;
-  final Object? body;
+  final String? body;
   final DateTime? receivedAt;
 
   NetworkResponseLogmanRecord({
@@ -111,6 +115,10 @@ class NetworkResponseLogmanRecord {
     required this.body,
     this.receivedAt,
   });
+
+  String get dateFormatted => receivedAt == null
+      ? ''
+      : DateFormat("EEE, MMM d 'at'").add_Hms().format(receivedAt!);
 
   String toReadableString() {
     return 'NetworkResponseLogmanRecord{statusCode: $statusCode, headers: $headers, body: $body, receivedAt: $receivedAt}';

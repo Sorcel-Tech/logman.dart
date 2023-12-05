@@ -40,7 +40,7 @@ class LogmanDioInterceptor extends Interceptor {
       id: id!,
       statusCode: response.statusCode,
       headers: responseHeaders,
-      body: response.data,
+      body: response.data.toString(),
       receivedAt: receivedAt,
     );
 
@@ -60,7 +60,8 @@ class LogmanDioInterceptor extends Interceptor {
       id: id!,
       statusCode: err.response?.statusCode ?? 0,
       headers: responseHeaders,
-      body: err.response?.data,
+      body: err.response?.data.toString(),
+      receivedAt: DateTime.now(),
     );
 
     _logman.recordNetworkResponse(responseRecord);

@@ -26,11 +26,22 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (e) {
       logman.recordSimpleLog(e.toString());
     }
+    await dio.get(
+      'https://jsonplaceholder.typicode.com/posts/1',
+    );
   }
 
   Future<void> getItems() async {
-    final response =
-        await dio.get('https://jsonplaceholder.typicode.com/posts');
+    final response = await dio.get(
+      'https://jsonplaceholder.typicode.com/posts',
+      options: Options(
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer 1234567890'
+        },
+      ),
+    );
     final items = response.data as List<dynamic>;
     posts = items.map((element) => PostModel.fromJson(element)).toList();
     setState(() {});

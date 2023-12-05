@@ -12,8 +12,8 @@ extension NetworkLogmanRecordExtensions on NetworkLogmanRecord {
 }
 
 extension NetworkResponseLogmanRecordExtensions on NetworkResponseLogmanRecord {
-  String get sizeInKb {
+  String get sizeInBytes {
     final encoded = utf8.encode(body.toString());
-    return '${(encoded.length / 1024).toStringAsFixed(2)} kb';
+    return '${encoded.length} bytes';
   }
 }

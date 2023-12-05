@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:logman/logman.dart';
 import 'package:logman/src/presentation/presentation.dart';
 
+/// A widget that provides an overlay for logging and debugging.
+/// It can attach a draggable floating action button (FAB) to the app's UI.
 class LogmanOverlay extends StatelessWidget {
   final Widget? button;
   final Widget? debugPage;
@@ -66,6 +68,7 @@ class _DraggableFABState extends State<_DraggableFAB> {
   final containerSize = 50.0;
   final GlobalKey _buttonKey = GlobalKey();
   bool isOpened = false;
+  final padding = 10.0;
 
   @override
   void initState() {
@@ -73,7 +76,7 @@ class _DraggableFABState extends State<_DraggableFAB> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final size = MediaQuery.of(context).size;
       final buttonSize = _buttonKey.currentContext!.size!;
-      dx = size.width - (buttonSize.width + 10);
+      dx = size.width - (buttonSize.width + padding);
       dy = (size.height / 2) - (buttonSize.height / 2);
       setState(() {});
     });
@@ -87,7 +90,6 @@ class _DraggableFABState extends State<_DraggableFAB> {
     final screenHeight = MediaQuery.of(context).size.height;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     final topPadding = MediaQuery.of(context).padding.top;
-    const padding = 10.0;
 
     return Positioned(
       top: dy,
