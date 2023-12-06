@@ -185,32 +185,35 @@ class _NetworkRecordDetailsPageState extends State<NetworkRecordDetailsPage>
         const CustomDivider(),
         _NetworkDetailItem(
           title: 'Headers',
-          subtitleWidget: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (final entry in record.response!.headers!.entries)
-                GestureDetector(
-                  onTap: () => entry.value.copyToClipboard(context),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${entry.key}: ',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+          subtitleWidget: (record.response?.headers?.isEmpty ?? true)
+              ? null
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (final entry in record.response!.headers!.entries)
+                      GestureDetector(
+                        onTap: () => entry.value.copyToClipboard(context),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${entry.key}: ',
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            Flexible(child: Text(entry.value)),
+                          ],
+                        ),
                       ),
-                      Flexible(child: Text(entry.value)),
-                    ],
-                  ),
+                  ],
                 ),
-            ],
-          ),
         ),
         const CustomDivider(),
         _NetworkDetailItem(
           title: 'Body',
-          subtitle: record.response!.body == null
+          subtitle: record.response?.body == null
               ? 'No body passed with request'
-              : record.response!.body.toString(),
+              : record.response?.body.toString(),
         ),
         const SizedBox(height: 30.0),
       ],
@@ -243,7 +246,7 @@ class _NetworkDetailItem extends StatelessWidget {
       ),
       subtitle: subtitleWidget ??
           SelectableText(
-            subtitle!,
+            subtitle ?? '',
             style: const TextStyle(fontSize: 14.0),
           ),
     );
