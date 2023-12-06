@@ -14,8 +14,8 @@ A simple yet powerful logging package for Flutter apps with an integrated UI and
 
 ## Screenshots
 
-<img src="doc/screenshots/1.png" width="300"> <img src="doc/screenshots/2.png" width="300"> 
-<img src="doc/screenshots/3.png" width="300"> <img src="doc/screenshots/4.png" width="300"> 
+<img src="https://raw.githubusercontent.com/Sorcel-Tech/logman.dart/main/doc/screenshots/1.png" width="300"> <img src="https://raw.githubusercontent.com/Sorcel-Tech/logman.dart/main/doc/screenshots/2.png" width="300"> 
+<img src="https://raw.githubusercontent.com/Sorcel-Tech/logman.dart/main/doc/screenshots/3.png" width="300"> <img src="https://raw.githubusercontent.com/Sorcel-Tech/logman.dart/main/doc/screenshots/4.png" width="300"> 
 
 
 ## Installation

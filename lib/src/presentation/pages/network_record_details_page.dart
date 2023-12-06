@@ -185,6 +185,7 @@ class _NetworkRecordDetailsPageState extends State<NetworkRecordDetailsPage>
         const CustomDivider(),
         _NetworkDetailItem(
           title: 'Headers',
+          subtitle: 'No headers received with response',
           subtitleWidget: (record.response?.headers?.isEmpty ?? true)
               ? null
               : Column(
