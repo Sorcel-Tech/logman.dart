@@ -149,7 +149,7 @@ class _NetworkRecordDetailsPageState extends State<NetworkRecordDetailsPage>
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Text(entry.value.toString()),
+                            Flexible(child: Text(entry.value.toString())),
                           ],
                         ),
                       ),
@@ -246,8 +246,8 @@ class _NetworkDetailItem extends StatelessWidget {
         style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
       ),
       subtitle: subtitleWidget ??
-          SelectableText(
-            subtitle!,
+          Text(
+            subtitle ?? 'No data',
             style: const TextStyle(fontSize: 14.0),
           ),
     );

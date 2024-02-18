@@ -44,7 +44,7 @@ class NavigationRecordItem extends StatelessWidget {
         'Navigation ${record.action.toString().split('.').last}: ${record.route.settings.name}';
     return Text(
       titleText,
-      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0),
+      style: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.w600),
     );
   }
 }

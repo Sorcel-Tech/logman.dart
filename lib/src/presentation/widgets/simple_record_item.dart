@@ -15,7 +15,7 @@ class SimpleRecordItem extends StatelessWidget {
       ),
       title: Text(
         record.source,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0),
+        style: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.w600),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
