@@ -214,7 +214,7 @@ class _NetworkRecordDetailsPageState extends State<NetworkRecordDetailsPage>
           title: 'Body',
           subtitle: record.response!.body == null
               ? 'No body passed with request'
-              : record.response!.body.toString(),
+              : record.response!.body!,
         ),
         const SizedBox(height: 30.0),
       ],

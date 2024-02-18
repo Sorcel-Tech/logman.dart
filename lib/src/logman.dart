@@ -13,6 +13,8 @@ class Logman {
     _logger = Logger();
   }
 
+  bool printLogs = true;
+
   /// The single public instance of Logman.
   static final Logman instance = Logman._internal();
 
@@ -32,7 +34,19 @@ class Logman {
         source: StackTrace.current.traceSource,
       ),
     );
-    _logger.i(message);
+    if (printLogs) _logger.i(message.shorten());
+  }
+
+  /// Records a simple log message.
+  void recordErrorLog(String message) {
+    _addRecord(
+      SimpleLogmanRecord(
+        message: message,
+        source: StackTrace.current.traceSource,
+        isError: true,
+      ),
+    );
+    if (printLogs) _logger.e(message.shorten());
   }
 
   /// Records navigation events in the application.
@@ -46,13 +60,13 @@ class Logman {
       return;
     }
     _addRecord(record);
-    _logger.i(record);
+    if (printLogs) _logger.i(record);
   }
 
   /// Records a network request.
   void recordNetworkRequest(NetworkRequestLogmanRecord netWorkRequest) {
     _addRecord(NetworkLogmanRecord(request: netWorkRequest));
-    _logger.i(netWorkRequest.toReadableString());
+    if (printLogs) _logger.i(netWorkRequest.toReadableString().shorten());
   }
 
   /// Updates a network log with the corresponding response.
@@ -71,7 +85,7 @@ class Logman {
       );
       records[index] = networkRecord;
       _records.value = records;
-      _logger.i(networkRecord.toReadableString());
+      if (printLogs) _logger.i(networkRecord.toReadableString().shorten());
     }
   }
 
@@ -85,7 +99,9 @@ class Logman {
     required BuildContext context,
     Widget? button,
     Widget? debugPage,
+    bool printLogs = true,
   }) {
+    this.printLogs = printLogs;
     return LogmanOverlay.attachOverlay(
       context: context,
       logman: this,

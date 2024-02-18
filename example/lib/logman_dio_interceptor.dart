@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:logman/logman.dart';
@@ -20,7 +22,7 @@ class LogmanDioInterceptor extends Interceptor {
       url: options.uri.toString(),
       method: options.method,
       headers: options.headers,
-      body: options.data,
+      body: dataToString(options.data),
       sentAt: sentAt,
     );
     _logman.recordNetworkRequest(requestRecord);
@@ -40,7 +42,7 @@ class LogmanDioInterceptor extends Interceptor {
       id: id!,
       statusCode: response.statusCode,
       headers: responseHeaders,
-      body: response.data.toString(),
+      body: dataToString(response.data),
       receivedAt: receivedAt,
     );
 
@@ -60,12 +62,22 @@ class LogmanDioInterceptor extends Interceptor {
       id: id!,
       statusCode: err.response?.statusCode ?? 0,
       headers: responseHeaders,
-      body: err.response?.data.toString(),
+      body: dataToString(err.response?.data),
       receivedAt: DateTime.now(),
     );
 
     _logman.recordNetworkResponse(responseRecord);
 
     return super.onError(err, handler);
+  }
+
+  String dataToString(dynamic data) {
+    if (data is Map) {
+      return jsonEncode(data);
+    } else if (data is List) {
+      return jsonEncode(data);
+    } else {
+      return data.toString();
+    }
   }
 }

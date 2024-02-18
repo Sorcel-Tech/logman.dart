@@ -21,7 +21,7 @@ class NetworkRecordItem extends StatelessWidget {
       subtitle: _buildSubtitle(),
       trailing: record.response == null
           ? const CupertinoActivityIndicator()
-          : const Icon(Icons.chevron_right, color: Colors.grey),
+          : const Icon(Icons.chevron_right, color: Colors.black),
     );
   }
 

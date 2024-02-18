@@ -9,7 +9,10 @@ class SimpleRecordItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: () => record.message.copyToClipboard(context),
-      leading: const Icon(Icons.info_outline),
+      leading: Icon(
+        record.isError ? Icons.error : Icons.info_outline,
+        color: record.isError ? Colors.red : Colors.black,
+      ),
       title: Text(
         record.source,
         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0),
@@ -27,6 +30,7 @@ class SimpleRecordItem extends StatelessWidget {
           ),
         ],
       ),
+      trailing: const Icon(Icons.copy, color: Colors.black),
     );
   }
 }
