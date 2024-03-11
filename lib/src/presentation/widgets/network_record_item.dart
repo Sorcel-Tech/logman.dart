@@ -16,12 +16,17 @@ class NetworkRecordItem extends StatelessWidget {
   Widget _buildNetworkItem(BuildContext context) {
     return ListTile(
       onTap: () => _navigateToDetails(context),
-      leading: _buildStatusIcon(),
-      title: _buildTitle(),
+      title: Row(
+        children: [
+          _buildStatusIcon(),
+          const SizedBox(width: 8.0),
+          Flexible(child: _buildTitle()),
+        ],
+      ),
       subtitle: _buildSubtitle(),
       trailing: record.response == null
           ? const CupertinoActivityIndicator()
-          : const Icon(Icons.chevron_right, color: Colors.black),
+          : const Icon(Icons.chevron_right, color: Colors.black, size: 18.0),
     );
   }
 
@@ -46,14 +51,14 @@ class NetworkRecordItem extends StatelessWidget {
       color = Colors.red;
     }
 
-    return Icon(icon, color: color);
+    return Icon(icon, color: color, size: 15.0);
   }
 
   Widget _buildTitle() {
     return Text(
       '${record.request.method} ${Uri.parse(record.request.url).path}',
       overflow: TextOverflow.ellipsis,
-      maxLines: 2,
+      maxLines: 1,
       style: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.w600),
     );
   }
@@ -67,7 +72,7 @@ class NetworkRecordItem extends StatelessWidget {
           record.request.url,
           overflow: TextOverflow.ellipsis,
           maxLines: 2,
-          style: const TextStyle(fontSize: 14.0),
+          style: const TextStyle(fontSize: 13.0),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 4.0),
@@ -75,7 +80,7 @@ class NetworkRecordItem extends StatelessWidget {
             record.response == null
                 ? record.timeFormatted
                 : '${record.timeFormatted} • ${record.durationInMs}',
-            style: const TextStyle(fontSize: 14.0, color: Colors.grey),
+            style: const TextStyle(fontSize: 13.0, color: Colors.grey),
           ),
         ),
       ],

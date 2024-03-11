@@ -38,15 +38,15 @@ class Logman {
   }
 
   /// Records a simple log message.
-  void error(String message) {
+  void error(Object error, {StackTrace? stackTrace}) {
     _addRecord(
       SimpleLogmanRecord(
-        message: message,
-        source: StackTrace.current.traceSource,
+        message: error.toString(),
+        source: stackTrace?.traceSource ?? StackTrace.current.traceSource,
         isError: true,
       ),
     );
-    if (printLogs) _logger.e(message.shorten());
+    if (printLogs) _logger.e(error.toString().shorten());
   }
 
   /// Records navigation events in the application.

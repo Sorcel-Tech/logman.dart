@@ -8,11 +8,16 @@ class NavigationRecordItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: _buildLeadingIcon(record.action),
-      title: _buildTitleText(),
+      title: Row(
+        children: [
+          _buildLeadingIcon(record.action),
+          const SizedBox(width: 8.0),
+          _buildTitleText(),
+        ],
+      ),
       subtitle: Text(
         record.timeFormatted,
-        style: const TextStyle(fontSize: 14.0, color: Colors.grey),
+        style: const TextStyle(fontSize: 13.0, color: Colors.grey),
       ),
     );
   }
@@ -36,7 +41,7 @@ class NavigationRecordItem extends StatelessWidget {
         color = Colors.grey;
     }
 
-    return Icon(icon, color: color);
+    return Icon(icon, color: color, size: 15);
   }
 
   Widget _buildTitleText() {

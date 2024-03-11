@@ -9,28 +9,42 @@ class SimpleRecordItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: () => record.message.copyToClipboard(context),
-      leading: Icon(
-        record.isError ? Icons.error : Icons.info_outline,
-        color: record.isError ? Colors.red : Colors.black,
-      ),
-      title: Text(
-        record.source,
-        style: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.w600),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
+      title: Row(
+        children: [
+          Icon(
+            record.isError ? Icons.error : Icons.info_outline,
+            color: record.isError ? Colors.red : Colors.black,
+            size: 15.0,
+          ),
+          const SizedBox(width: 8.0),
+          Flexible(
+            child: Text(
+              record.source,
+              style:
+                  const TextStyle(fontSize: 13.0, fontWeight: FontWeight.w600),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
       ),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(record.message, maxLines: 4, overflow: TextOverflow.ellipsis),
+          Text(
+            record.message,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 13.0),
+          ),
           const SizedBox(height: 5),
           Text(
             record.timeFormatted,
-            style: const TextStyle(fontSize: 14.0, color: Colors.grey),
+            style: const TextStyle(fontSize: 13.0, color: Colors.grey),
           ),
         ],
       ),
-      trailing: const Icon(Icons.copy, color: Colors.black),
+      trailing: const Icon(Icons.copy, color: Colors.black, size: 15.0),
     );
   }
 }

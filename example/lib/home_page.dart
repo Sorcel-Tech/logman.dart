@@ -61,8 +61,6 @@ class _MyHomePageState extends State<MyHomePage> {
           onPressed: () {},
           child: const Icon(Icons.bug_report),
         ),
-        printLogs: false,
-        showOverlay: false,
       );
     });
   }
