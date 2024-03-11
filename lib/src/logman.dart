@@ -27,7 +27,7 @@ class Logman {
       _records.value = [..._records.value, record];
 
   /// Records a simple log message.
-  void recordSimpleLog(String message) {
+  void info(String message) {
     _addRecord(
       SimpleLogmanRecord(
         message: message,
@@ -38,7 +38,7 @@ class Logman {
   }
 
   /// Records a simple log message.
-  void recordErrorLog(String message) {
+  void error(String message) {
     _addRecord(
       SimpleLogmanRecord(
         message: message,
@@ -50,7 +50,7 @@ class Logman {
   }
 
   /// Records navigation events in the application.
-  void recordNavigation(NavigationLogmanRecord record) {
+  void navigation(NavigationLogmanRecord record) {
     final currentRouteName = record.route.settings.name ?? '';
     final previousRouteName = record.previousRoute?.settings.name ?? '';
 
@@ -64,13 +64,13 @@ class Logman {
   }
 
   /// Records a network request.
-  void recordNetworkRequest(NetworkRequestLogmanRecord netWorkRequest) {
+  void networkRequest(NetworkRequestLogmanRecord netWorkRequest) {
     _addRecord(NetworkLogmanRecord(request: netWorkRequest));
     if (printLogs) _logger.i(netWorkRequest.toReadableString().shorten());
   }
 
   /// Updates a network log with the corresponding response.
-  void recordNetworkResponse(NetworkResponseLogmanRecord record) {
+  void networkResponse(NetworkResponseLogmanRecord record) {
     final records = List<LogmanRecord>.from(_records.value);
     final index = records.indexWhere((element) {
       if (element is NetworkLogmanRecord) {
@@ -100,8 +100,12 @@ class Logman {
     Widget? button,
     Widget? debugPage,
     bool printLogs = true,
+    bool showOverlay = true,
   }) {
     this.printLogs = printLogs;
+
+    if (!showOverlay) return;
+
     return LogmanOverlay.attachOverlay(
       context: context,
       logman: this,

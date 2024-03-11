@@ -24,7 +24,7 @@ class _MyHomePageState extends State<MyHomePage> {
       await dio.get(
           'https://jobs.github.com/positions.json?description=api&location=new+york');
     } catch (e) {
-      logman.recordErrorLog(e.toString());
+      logman.error(e.toString());
     }
     await dio.get(
       'https://jsonplaceholder.typicode.com/posts/1',
@@ -62,6 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child: const Icon(Icons.bug_report),
         ),
         printLogs: false,
+        showOverlay: false,
       );
     });
   }

@@ -12,7 +12,7 @@ void main() {
 
     test('recordSimpleLog', () {
       final logman = Logman.instance;
-      logman.recordSimpleLog('test');
+      logman.info('test');
       expect(logman.records.value.length, 1);
       expect(logman.records.value.first, isA<SimpleLogmanRecord>());
     });
@@ -23,7 +23,7 @@ void main() {
         route: MaterialPageRoute(builder: (context) => Container()),
         action: NavigationAction.push,
       );
-      logman.recordNavigation(record);
+      logman.navigation(record);
       expect(logman.records.value.isNotEmpty, true);
       expect(logman.records.value.last, isA<NavigationLogmanRecord>());
     });
@@ -37,7 +37,7 @@ void main() {
         body: {'name': 'John Doe'},
         id: '1234567890',
       );
-      logman.recordNetworkRequest(record);
+      logman.networkRequest(record);
       expect(logman.records.value.isNotEmpty, true);
       expect(logman.records.value.last, isA<NetworkLogmanRecord>());
     });
@@ -50,7 +50,7 @@ void main() {
         headers: {'Content-Type': 'application/json'},
         body: {'name': 'John Doe'}.toString(),
       );
-      logman.recordNetworkResponse(record);
+      logman.networkResponse(record);
       expect(logman.records.value.isNotEmpty, true);
       expect(logman.records.value.last, isA<NetworkLogmanRecord>());
     });

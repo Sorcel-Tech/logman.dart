@@ -20,7 +20,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    Logman.instance.recordSimpleLog('App started!');
+    Logman.instance.info('App started!');
   }
 
   @override

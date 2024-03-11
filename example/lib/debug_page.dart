@@ -26,7 +26,7 @@ class DebugPage extends StatelessWidget {
                 value: isDarkMode,
                 onChanged: (value) {
                   isDarkModeNotifier.value = value;
-                  Logman.instance.recordSimpleLog(
+                  Logman.instance.info(
                     'Dark mode is now ${value ? 'enabled' : 'disabled'}',
                   );
                 },
