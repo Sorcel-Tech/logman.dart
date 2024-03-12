@@ -55,8 +55,8 @@ class Logman {
     final previousRouteName = record.previousRoute?.settings.name ?? '';
 
     // Ignore Logman routes
-    if (currentRouteName.contains('/logman') ||
-        previousRouteName.contains('/logman')) {
+    if (currentRouteName.contains('logman') ||
+        previousRouteName.contains('logman')) {
       return;
     }
     _addRecord(record);

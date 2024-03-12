@@ -40,7 +40,7 @@ class _NetworkRecordDetailsPageState extends State<NetworkRecordDetailsPage>
           '${record.request.method} ${Uri.parse(record.request.url).path}',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 20.0),
+          style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
         ),
         bottom: TabBar(
           controller: _tabController,
@@ -202,7 +202,7 @@ class _NetworkRecordDetailsPageState extends State<NetworkRecordDetailsPage>
                               style:
                                   const TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            Flexible(child: Text(entry.value)),
+                            Flexible(child: SelectableText(entry.value)),
                           ],
                         ),
                       ),
@@ -246,7 +246,7 @@ class _NetworkDetailItem extends StatelessWidget {
         style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
       ),
       subtitle: subtitleWidget ??
-          Text(
+          SelectableText(
             subtitle ?? 'No data',
             style: const TextStyle(fontSize: 14.0),
           ),

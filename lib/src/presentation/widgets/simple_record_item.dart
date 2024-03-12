@@ -14,14 +14,14 @@ class SimpleRecordItem extends StatelessWidget {
           Icon(
             record.isError ? Icons.error : Icons.info_outline,
             color: record.isError ? Colors.red : Colors.black,
-            size: 15.0,
+            size: 17.0,
           ),
           const SizedBox(width: 8.0),
           Flexible(
             child: Text(
               record.source,
               style:
-                  const TextStyle(fontSize: 13.0, fontWeight: FontWeight.w600),
+                  const TextStyle(fontSize: 14.0, fontWeight: FontWeight.w600),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -44,7 +44,7 @@ class SimpleRecordItem extends StatelessWidget {
           ),
         ],
       ),
-      trailing: const Icon(Icons.copy, color: Colors.black, size: 15.0),
+      trailing: const Icon(Icons.copy, color: Colors.black, size: 17.0),
     );
   }
 }

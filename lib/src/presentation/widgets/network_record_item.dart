@@ -26,7 +26,7 @@ class NetworkRecordItem extends StatelessWidget {
       subtitle: _buildSubtitle(),
       trailing: record.response == null
           ? const CupertinoActivityIndicator()
-          : const Icon(Icons.chevron_right, color: Colors.black, size: 18.0),
+          : const Icon(Icons.chevron_right, color: Colors.black, size: 17.0),
     );
   }
 
@@ -51,7 +51,7 @@ class NetworkRecordItem extends StatelessWidget {
       color = Colors.red;
     }
 
-    return Icon(icon, color: color, size: 15.0);
+    return Icon(icon, color: color, size: 17.0);
   }
 
   Widget _buildTitle() {

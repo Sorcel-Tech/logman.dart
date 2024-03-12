@@ -42,7 +42,13 @@ class _LogmanDashboardPageState extends State<LogmanDashboardPage>
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('Logman'),
+        title: const Text(
+          'Logman',
+          style: TextStyle(
+            fontSize: 20.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
         bottom: TabBar(
           controller: _tabController,

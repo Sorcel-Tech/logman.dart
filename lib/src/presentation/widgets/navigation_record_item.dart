@@ -41,13 +41,13 @@ class NavigationRecordItem extends StatelessWidget {
         color = Colors.grey;
     }
 
-    return Icon(icon, color: color, size: 15);
+    return Icon(icon, color: color, size: 18);
   }
 
   Widget _buildTitleText() {
     final titleText =
         'Navigation ${record.action.toString().split('.').last}: ${record.route.settings.name}';
-    return Text(
+    return SelectableText(
       titleText,
       style: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.w600),
     );
