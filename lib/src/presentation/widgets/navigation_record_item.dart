@@ -12,7 +12,7 @@ class NavigationRecordItem extends StatelessWidget {
         children: [
           _buildLeadingIcon(record.action),
           const SizedBox(width: 8.0),
-          _buildTitleText(),
+          Expanded(child: _buildTitleText()),
         ],
       ),
       subtitle: Text(
