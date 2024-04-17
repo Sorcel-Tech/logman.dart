@@ -203,8 +203,8 @@ class _NetworkRecordDetailsPageState extends State<NetworkRecordDetailsPage>
                                   const TextStyle(fontWeight: FontWeight.bold),
                             ),
                             Flexible(
-                                child:
-                                    SelectableText(entry.value.formatJson())),
+                              child: SelectableText(entry.value.formatJson()),
+                            ),
                           ],
                         ),
                       ),

@@ -15,7 +15,7 @@ class NetworkLogmanRecord extends LogmanRecord {
   String toReadableString() {
     final readableJson =
         '{request: ${request.toReadableString()}, response: ${response?.toReadableString()}}';
-    return 'NetworkLogmanRecord ::: $readableJson';
+    return readableJson.shorten().formatJson();
   }
 
   @override
@@ -74,7 +74,8 @@ class NetworkResponseLogmanRecord {
 
   String toReadableString() {
     final readableJson =
-        '{statusCode: $statusCode, headers: ${headers ?? ''}, body: ${body ?? ''}, receivedAt: $receivedAt}';
+        '{statusCode: $statusCode, headers: ${headers ?? ''}, body: ${body ?? ''}, receivedAt: $receivedAt}'
+            .formatJson();
     return 'NetworkResponseLogmanRecord $readableJson';
   }
 }

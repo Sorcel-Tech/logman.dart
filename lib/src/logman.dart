@@ -66,7 +66,7 @@ class Logman {
   /// Records a network request.
   void networkRequest(NetworkRequestLogmanRecord netWorkRequest) {
     _addRecord(NetworkLogmanRecord(request: netWorkRequest));
-    if (printLogs) _logger.i(netWorkRequest.toReadableString().shorten());
+    if (printLogs) _logger.i(netWorkRequest.toReadableString());
   }
 
   /// Updates a network log with the corresponding response.
@@ -85,7 +85,7 @@ class Logman {
       );
       records[index] = networkRecord;
       _records.value = records;
-      if (printLogs) _logger.i(networkRecord.toReadableString().shorten());
+      if (printLogs) _logger.i(networkRecord.toReadableString());
     }
   }
 
