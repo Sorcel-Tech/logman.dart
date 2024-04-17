@@ -125,7 +125,7 @@ class _NetworkRecordDetailsPageState extends State<NetworkRecordDetailsPage>
           title: 'Body',
           subtitle: record.request.body == null
               ? 'No body sent with request'
-              : record.request.body.toString(),
+              : record.request.body.toString().formatJson(),
         ),
         const CustomDivider(),
         _NetworkDetailItem(
@@ -202,7 +202,7 @@ class _NetworkRecordDetailsPageState extends State<NetworkRecordDetailsPage>
                               style:
                                   const TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            Flexible(child: SelectableText(entry.value)),
+                            Flexible(child: SelectableText(entry.value.formatJson())),
                           ],
                         ),
                       ),
@@ -214,7 +214,7 @@ class _NetworkRecordDetailsPageState extends State<NetworkRecordDetailsPage>
           title: 'Body',
           subtitle: record.response!.body == null
               ? 'No body passed with request'
-              : record.response!.body!,
+              : record.response!.body!.formatJson(),
         ),
         const SizedBox(height: 30.0),
       ],

@@ -39,6 +39,21 @@ extension StringExtensions on String {
 
     return shortened;
   }
+
+  String formatJson() {
+    try {
+      // Decode the JSON string
+      final jsonData = jsonDecode(this);
+
+      // Encode the JSON data with pretty printing
+      const JsonEncoder encoder = JsonEncoder.withIndent('  ');
+      return encoder.convert(jsonData);
+    } catch (e) {
+      // Return the original string if it's not valid JSON
+      return this;
+    }
+
+  }
 }
 
 dynamic _convertToEncodable(dynamic item) {
