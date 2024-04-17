@@ -26,7 +26,7 @@ class NetworkRecordItem extends StatelessWidget {
       subtitle: _buildSubtitle(),
       trailing: record.response == null
           ? const CupertinoActivityIndicator()
-          : const Icon(Icons.chevron_right, color: Colors.black, size: 17.0),
+          : const Icon(Icons.chevron_right, size: 17.0),
     );
   }
 
@@ -80,7 +80,7 @@ class NetworkRecordItem extends StatelessWidget {
             record.response == null
                 ? record.timeFormatted
                 : '${record.timeFormatted} • ${record.durationInMs}',
-            style: const TextStyle(fontSize: 13.0, color: Colors.grey),
+            style: const TextStyle(fontSize: 12.0, color: Colors.grey),
           ),
         ),
       ],
