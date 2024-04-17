@@ -62,7 +62,8 @@ class _DraggableFAB extends StatefulWidget {
   State<_DraggableFAB> createState() => _DraggableFABState();
 }
 
-class _DraggableFABState extends State<_DraggableFAB> {
+class _DraggableFABState extends State<_DraggableFAB>
+    with WidgetsBindingObserver {
   double dx = 50.0;
   double dy = 50.0;
   final containerSize = 50.0;
@@ -80,6 +81,34 @@ class _DraggableFABState extends State<_DraggableFAB> {
       dy = (size.height / 2) - (buttonSize.height / 2);
       setState(() {});
     });
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => updatePosition(context));
+  }
+
+  void updatePosition(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final buttonSize =
+        _buttonKey.currentContext?.size ?? Size(containerSize, containerSize);
+    dx = (dx < size.width / 2)
+        ? padding
+        : size.width - (buttonSize.width + padding);
+    dy = min(
+      size.height - (buttonSize.height + MediaQuery.of(context).padding.bottom),
+      max(MediaQuery.of(context).padding.top + kToolbarHeight, dy),
+    );
+    setState(() {});
   }
 
   Logman get logman => widget.logman;

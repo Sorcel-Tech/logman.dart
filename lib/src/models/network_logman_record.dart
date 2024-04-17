@@ -13,7 +13,8 @@ class NetworkLogmanRecord extends LogmanRecord {
   String get id => request.id;
 
   String toReadableString() {
-    final readableJson = '{request: ${request.toReadableString()}, response: ${response?.toReadableString()}}';
+    final readableJson =
+        '{request: ${request.toReadableString()}, response: ${response?.toReadableString()}}';
     return 'NetworkLogmanRecord ::: $readableJson';
   }
 
@@ -45,7 +46,9 @@ class NetworkRequestLogmanRecord {
       : DateFormat("EEE, MMM d 'at'").add_Hms().format(sentAt!);
 
   String toReadableString() {
-    final readableJson = '{url: $url, method: $method, headers: ${headers ?? ''}, body: ${body ?? ''}, sentAt: $sentAt}'.formatJson();
+    final readableJson =
+        '{url: $url, method: $method, headers: ${headers ?? ''}, body: ${body ?? ''}, sentAt: $sentAt}'
+            .formatJson();
     return 'NetworkRequestLogmanRecord $readableJson';
   }
 }
@@ -70,7 +73,8 @@ class NetworkResponseLogmanRecord {
       : DateFormat("EEE, MMM d 'at'").add_Hms().format(receivedAt!);
 
   String toReadableString() {
-    final readableJson = '{statusCode: $statusCode, headers: ${headers ?? ''}, body: ${body ?? ''}, receivedAt: $receivedAt}';
+    final readableJson =
+        '{statusCode: $statusCode, headers: ${headers ?? ''}, body: ${body ?? ''}, receivedAt: $receivedAt}';
     return 'NetworkResponseLogmanRecord $readableJson';
   }
 }

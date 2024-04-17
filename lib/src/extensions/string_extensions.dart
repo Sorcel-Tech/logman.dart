@@ -52,7 +52,6 @@ extension StringExtensions on String {
       // Return the original string if it's not valid JSON
       return this;
     }
-
   }
 }
 
