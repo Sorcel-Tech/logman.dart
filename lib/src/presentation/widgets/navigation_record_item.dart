@@ -17,7 +17,7 @@ class NavigationRecordItem extends StatelessWidget {
       ),
       subtitle: Text(
         record.timeFormatted,
-        style: const TextStyle(fontSize: 13.0, color: Colors.grey),
+        style: const TextStyle(fontSize: 12.0, color: Colors.grey),
       ),
     );
   }

@@ -13,7 +13,7 @@ class SimpleRecordItem extends StatelessWidget {
         children: [
           Icon(
             record.isError ? Icons.error : Icons.info_outline,
-            color: record.isError ? Colors.red : Colors.black,
+            color: record.isError ? Colors.red : null,
             size: 17.0,
           ),
           const SizedBox(width: 8.0),
@@ -40,11 +40,11 @@ class SimpleRecordItem extends StatelessWidget {
           const SizedBox(height: 5),
           Text(
             record.timeFormatted,
-            style: const TextStyle(fontSize: 13.0, color: Colors.grey),
+            style: const TextStyle(fontSize: 12.0, color: Colors.grey),
           ),
         ],
       ),
-      trailing: const Icon(Icons.copy, color: Colors.black, size: 17.0),
+      trailing: const Icon(Icons.copy, size: 17.0),
     );
   }
 }
