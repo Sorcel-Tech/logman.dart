@@ -60,12 +60,14 @@ void initState() {
 
 2. Log events
 
-There are 3 types of logs currently (simple, navigation, and network).
+There are 3 types of logs currently (simple , navigation, and network).
+
+For logging simple (info) logs:
 
 ```dart
 final Logman _logman = Logman.instance;
 
-_logman.recordSimpleLog('test');
+_logman.info('test');
 ```
 
 There's a [Dio interceptor ready for use in the example app](https://github.com/Sorcel-Tech/logman.dart/blob/main/example/lib/logman_dio_interceptor.dart).
