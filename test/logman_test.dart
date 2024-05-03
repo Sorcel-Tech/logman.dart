@@ -11,6 +11,13 @@ void main() {
       logman.records.value = [];
     });
 
+    tearDown(() {
+      logman.stopTimer(); // Stop the timer after each test
+      logman.records.value = [];
+      logman.maxLogCount = 100;
+      logman.maxLogLifetime = const Duration(minutes: 10);
+    });
+
     test('Singleton instance returns the same object', () {
       final logman1 = Logman.instance;
       final logman2 = Logman.instance;
@@ -90,6 +97,25 @@ void main() {
       expect(
         (logman.records.value.first as SimpleLogmanRecord).message,
         'New Log',
+      );
+    });
+
+    test('rotates logs based on timer', () async {
+      logman.maxLogLifetime = const Duration(seconds: 2);
+
+      logman.info('Log 1');
+      logman.info('Log 2');
+      await Future.delayed(const Duration(seconds: 2), () {});
+
+      logman.info('Log 3');
+      await Future.delayed(const Duration(seconds: 2), () {});
+
+      // After two rotation intervals, only 'Log 3' should remain
+      // because others are too old
+      expect(logman.records.value.length, 1);
+      expect(
+        (logman.records.value.first as SimpleLogmanRecord).message,
+        'Log 3',
       );
     });
   });

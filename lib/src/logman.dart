@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:logger/logger.dart';
 import 'package:logman/logman.dart';
@@ -10,26 +12,88 @@ import 'package:logman/src/presentation/presentation.dart';
 /// This class uses the Singleton pattern to ensure a single instance
 /// is used throughout the application.
 class Logman {
+  /// Logger instance for internal logging.
+  ///
+  /// This logger is used to log errors, warnings, and general information
+  /// within the `Logman` class.
   late final Logger _logger;
 
+  /// Private constructor for `Logman`, implementing the Singleton pattern.
+  ///
+  /// This constructor initializes the internal logger and starts the rotation
+  /// timer for log maintenance. It should be called only once and is not
+  /// meant to be used directly. Access the singleton instance via `Logman.instance`.
   Logman._internal() {
     _logger = Logger();
+    _startRotationTimer();
   }
 
+  /// Whether logs should be printed to the console.
+  ///
+  /// If `true`, logs are printed to the console using the internal logger.
+  /// This can be toggled to disable console logging for production.
   bool printLogs = true;
 
+  /// Maximum duration for which logs should be retained in memory.
+  ///
+  /// Any log older than this duration will be removed during log rotation.
   Duration maxLogLifetime = const Duration(minutes: 10);
 
+  /// Maximum number of logs that should be retained in memory.
+  ///
+  /// If the number of logs exceeds this count, older logs will be removed
+  /// during log rotation.
   int maxLogCount = 100;
+
+  /// Timer instance used for scheduling periodic log rotations.
+  ///
+  /// This timer triggers `_rotateRecords` at the interval defined by `rotationInterval`.
+  Timer? _rotationTimer;
+
+  /// Duration between consecutive log rotation executions.
+  ///
+  /// This interval defines how often `_rotateRecords` is called to remove
+  /// outdated logs and control the total log count.
+  Duration rotationInterval = const Duration(seconds: 30);
 
   /// The single public instance of Logman.
   static final Logman instance = Logman._internal();
 
+  /// Stores the list of log records currently retained in memory.
+  ///
+  /// This is a `ValueNotifier` that notifies listeners whenever the log
+  /// records are updated. The logs are retained in a list, which is managed
+  /// through log rotation methods like `_rotateRecords`.
+  /// Notes:
+  /// - The list of log records is constrained by `maxLogLifetime` and `maxLogCount`,
+  ///   meaning older or excessive logs are removed during log rotation.
+  /// - Use `ValueNotifier<List<LogmanRecord>>` to efficiently notify listeners
+  ///   of changes to the logs.
   final _records = ValueNotifier(<LogmanRecord>[]);
 
   /// Gets the current list of log records.
   ValueNotifier<List<LogmanRecord>> get records => _records;
 
+  /// Starts a periodic timer that triggers log rotation at a specified interval.
+  ///
+  /// The method cancels any existing timer before starting a new one, ensuring that
+  /// only one timer is running. The timer invokes `_rotateRecords` at each interval
+  /// to enforce log retention policies, such as `maxLogLifetime` and `maxLogCount`.
+  void _startRotationTimer() {
+    _rotationTimer?.cancel(); // Cancel any existing timer
+    _rotationTimer = Timer.periodic(rotationInterval, (timer) {
+      _rotateRecords();
+    });
+  }
+
+  /// Adds a new log record to the log list.
+  ///
+  /// This method appends a new log record to `_records`. It also explicitly calls
+  /// `_rotateRecords` to ensure that the log list adheres to the defined log
+  /// retention policies (like `maxLogLifetime` and `maxLogCount`).
+  ///
+  /// Parameters:
+  /// - `record`: The `LogmanRecord` instance representing the new log entry to add.
   void _addRecord(LogmanRecord record) {
     try {
       _records.value = [..._records.value, record];
@@ -154,7 +218,15 @@ class Logman {
     int? maxLogCount,
   }) {
     this.printLogs = printLogs;
-    if (maxLogLifetime != null) this.maxLogLifetime = maxLogLifetime;
+    if (maxLogLifetime != null) {
+      this.maxLogLifetime = maxLogLifetime;
+
+      if (maxLogLifetime < rotationInterval) {
+        rotationInterval = maxLogLifetime;
+        _startRotationTimer();
+      }
+    }
+
     if (maxLogCount != null) this.maxLogCount = maxLogCount;
 
     if (!showOverlay) return;
@@ -170,5 +242,10 @@ class Logman {
   /// Removes the logging overlay from the application UI.
   void removeOverlay() {
     return LogmanOverlay.removeOverlay();
+  }
+
+  /// Stops the log rotation timer.
+  void stopTimer() {
+    _rotationTimer?.cancel();
   }
 }
