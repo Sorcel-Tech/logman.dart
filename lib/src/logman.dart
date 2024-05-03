@@ -12,26 +12,63 @@ import 'package:logman/src/presentation/presentation.dart';
 /// This class uses the Singleton pattern to ensure a single instance
 /// is used throughout the application.
 class Logman {
+  /// Logger instance for internal logging.
+  ///
+  /// This logger is used to log errors, warnings, and general information
+  /// within the `Logman` class.
   late final Logger _logger;
 
+  /// Private constructor for `Logman`, implementing the Singleton pattern.
+  ///
+  /// This constructor initializes the internal logger and starts the rotation
+  /// timer for log maintenance. It should be called only once and is not
+  /// meant to be used directly. Access the singleton instance via `Logman.instance`.
   Logman._internal() {
     _logger = Logger();
     _startRotationTimer();
   }
 
+  /// Whether logs should be printed to the console.
+  ///
+  /// If `true`, logs are printed to the console using the internal logger.
+  /// This can be toggled to disable console logging for production.
   bool printLogs = true;
 
+  /// Maximum duration for which logs should be retained in memory.
+  ///
+  /// Any log older than this duration will be removed during log rotation.
   Duration maxLogLifetime = const Duration(minutes: 10);
 
+  /// Maximum number of logs that should be retained in memory.
+  ///
+  /// If the number of logs exceeds this count, older logs will be removed
+  /// during log rotation.
   int maxLogCount = 100;
 
+  /// Timer instance used for scheduling periodic log rotations.
+  ///
+  /// This timer triggers `_rotateRecords` at the interval defined by `rotationInterval`.
   Timer? _rotationTimer;
 
+  /// Duration between consecutive log rotation executions.
+  ///
+  /// This interval defines how often `_rotateRecords` is called to remove
+  /// outdated logs and control the total log count.
   Duration rotationInterval = const Duration(seconds: 30);
 
   /// The single public instance of Logman.
   static final Logman instance = Logman._internal();
 
+  /// Stores the list of log records currently retained in memory.
+  ///
+  /// This is a `ValueNotifier` that notifies listeners whenever the log
+  /// records are updated. The logs are retained in a list, which is managed
+  /// through log rotation methods like `_rotateRecords`.
+  /// Notes:
+  /// - The list of log records is constrained by `maxLogLifetime` and `maxLogCount`,
+  ///   meaning older or excessive logs are removed during log rotation.
+  /// - Use `ValueNotifier<List<LogmanRecord>>` to efficiently notify listeners
+  ///   of changes to the logs.
   final _records = ValueNotifier(<LogmanRecord>[]);
 
   /// Gets the current list of log records.
