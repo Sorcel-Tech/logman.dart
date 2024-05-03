@@ -4,21 +4,26 @@ import 'package:logman/logman.dart';
 
 void main() {
   group('Logman', () {
+    late Logman logman;
+
+    setUp(() {
+      logman = Logman.instance;
+      logman.records.value = [];
+    });
+
     test('Singleton instance returns the same object', () {
       final logman1 = Logman.instance;
       final logman2 = Logman.instance;
       expect(identical(logman1, logman2), isTrue);
     });
 
-    test('recordSimpleLog', () {
-      final logman = Logman.instance;
+    test('adds info log', () {
       logman.info('test');
       expect(logman.records.value.length, 1);
       expect(logman.records.value.first, isA<SimpleLogmanRecord>());
     });
 
-    test('recordNavigation', () {
-      final logman = Logman.instance;
+    test('adds navigation log', () {
       final record = NavigationLogmanRecord(
         route: MaterialPageRoute(builder: (context) => Container()),
         action: NavigationAction.push,
@@ -28,8 +33,7 @@ void main() {
       expect(logman.records.value.last, isA<NavigationLogmanRecord>());
     });
 
-    test('recordNetworkRequest', () {
-      final logman = Logman.instance;
+    test('adds network request log', () {
       const record = NetworkRequestLogmanRecord(
         url: 'https://example.com',
         method: 'GET',
@@ -42,8 +46,16 @@ void main() {
       expect(logman.records.value.last, isA<NetworkLogmanRecord>());
     });
 
-    test('recordNetworkResponse', () {
-      final logman = Logman.instance;
+    test('adds network response log', () {
+      const requestRecord = NetworkRequestLogmanRecord(
+        url: 'https://example.com',
+        method: 'GET',
+        headers: {'Content-Type': 'application/json'},
+        body: {'name': 'John Doe'},
+        id: '1234567890',
+      );
+      logman.networkRequest(requestRecord);
+
       final record = NetworkResponseLogmanRecord(
         id: '1234567890',
         statusCode: 200,
@@ -53,6 +65,32 @@ void main() {
       logman.networkResponse(record);
       expect(logman.records.value.isNotEmpty, true);
       expect(logman.records.value.last, isA<NetworkLogmanRecord>());
+    });
+
+    test('respects maxLogCount', () {
+      const int maxLogs = 5;
+      logman.maxLogCount = maxLogs;
+
+      for (int i = 0; i < maxLogs + 2; i++) {
+        logman.info('Log #$i');
+      }
+
+      expect(logman.records.value.length, maxLogs);
+    });
+
+    test('removes old logs based on maxLogLifetime', () async {
+      logman.maxLogLifetime = const Duration(seconds: 2);
+      logman.info('Old Log');
+
+      // advance time by 3 seconds to remove the old log
+      await Future.delayed(const Duration(seconds: 3), () {});
+
+      logman.info('New Log');
+      expect(logman.records.value.length, 1);
+      expect(
+        (logman.records.value.first as SimpleLogmanRecord).message,
+        'New Log',
+      );
     });
   });
 }
