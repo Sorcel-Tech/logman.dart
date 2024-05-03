@@ -4,8 +4,11 @@ import 'package:logman/logman.dart';
 import 'package:logman/src/presentation/presentation.dart';
 
 /// A logging utility class for Flutter applications.
-/// It supports various types of logs including simple logs, navigation, and network logs.
-/// This class uses the Singleton pattern to ensure a single instance is used throughout the application.
+/// It supports various types of logs including simple logs, navigation,
+/// and network logs.
+///
+/// This class uses the Singleton pattern to ensure a single instance
+/// is used throughout the application.
 class Logman {
   late final Logger _logger;
 
@@ -15,6 +18,10 @@ class Logman {
 
   bool printLogs = true;
 
+  Duration maxLogLifetime = const Duration(minutes: 10);
+
+  int maxLogCount = 100;
+
   /// The single public instance of Logman.
   static final Logman instance = Logman._internal();
 
@@ -23,8 +30,37 @@ class Logman {
   /// Gets the current list of log records.
   ValueNotifier<List<LogmanRecord>> get records => _records;
 
-  void _addRecord(LogmanRecord record) =>
+  void _addRecord(LogmanRecord record) {
+    try {
       _records.value = [..._records.value, record];
+      _rotateRecords();
+    } catch (e) {
+      _logger.e(e.toString());
+    }
+  }
+
+  /// Rotates the log records by enforcing the maximum log lifetime and count.
+  ///
+  /// This method performs the following operations:
+  /// 1. Filters the existing log records to retain only those that were created
+  ///    within the defined `maxLogLifetime`.
+  /// 2. Trims the list of remaining records to ensure that it does not exceed
+  ///    the `maxLogCount` limit, keeping only the most recent records.
+  ///
+  /// The resulting list of filtered records replaces the current log record list,
+  /// thus effectively managing memory usage.
+  void _rotateRecords() {
+    final now = DateTime.now();
+    var newRecords = _records.value.where((record) {
+      return now.difference(record.dateTime) < maxLogLifetime;
+    }).toList();
+
+    if (newRecords.length > maxLogCount) {
+      newRecords = newRecords.sublist(newRecords.length - maxLogCount);
+    }
+
+    _records.value = newRecords;
+  }
 
   /// Records a simple log message.
   void info(String message) {
@@ -93,16 +129,33 @@ class Logman {
   ///
   /// [button] is optional, the default button will be displayed if
   /// it's not giving
+  ///
   /// [debugPage] is also optional, you can see an example of this
   /// in the example app
+  ///
+  /// [printLogs] is optional and true by default, if set to false,
+  /// logs will not be printed
+  ///
+  /// [showOverlay] is optional and true by default, if set to false,
+  /// the overlay will not be displayed
+  ///
+  /// [maxLogLifetime] is optional and set to 10 minutes by default,
+  /// it defines the maximum lifetime of a single log record
+  ///
+  /// [maxLogCount] is optional and set to 100 by default, it defines
+  /// the maximum number of log records to keep
   void attachOverlay({
     required BuildContext context,
     Widget? button,
     Widget? debugPage,
     bool printLogs = true,
     bool showOverlay = true,
+    Duration? maxLogLifetime,
+    int? maxLogCount,
   }) {
     this.printLogs = printLogs;
+    if (maxLogLifetime != null) this.maxLogLifetime = maxLogLifetime;
+    if (maxLogCount != null) this.maxLogCount = maxLogCount;
 
     if (!showOverlay) return;
 
