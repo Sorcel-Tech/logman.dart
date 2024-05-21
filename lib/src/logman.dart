@@ -37,13 +37,13 @@ class Logman {
   /// Maximum duration for which logs should be retained in memory.
   ///
   /// Any log older than this duration will be removed during log rotation.
-  Duration maxLogLifetime = const Duration(minutes: 10);
+  Duration? maxLogLifetime;
 
   /// Maximum number of logs that should be retained in memory.
   ///
   /// If the number of logs exceeds this count, older logs will be removed
   /// during log rotation.
-  int maxLogCount = 100;
+  int? maxLogCount;
 
   /// Timer instance used for scheduling periodic log rotations.
   ///
@@ -115,12 +115,18 @@ class Logman {
   /// thus effectively managing memory usage.
   void _rotateRecords() {
     final now = DateTime.now();
-    var newRecords = _records.value.where((record) {
-      return now.difference(record.dateTime) < maxLogLifetime;
-    }).toList();
+    var newRecords = _records.value;
 
-    if (newRecords.length > maxLogCount) {
-      newRecords = newRecords.sublist(newRecords.length - maxLogCount);
+    // Check if maxLogLifetime is not null before filtering by dateTime difference
+    if (maxLogLifetime != null) {
+      newRecords = newRecords.where((record) {
+        return now.difference(record.dateTime) < maxLogLifetime!;
+      }).toList();
+    }
+
+    // Check if maxLogCount is not null before limiting the number of records
+    if (maxLogCount != null && newRecords.length > maxLogCount!) {
+      newRecords = newRecords.sublist(newRecords.length - maxLogCount!);
     }
 
     _records.value = newRecords;
@@ -203,11 +209,11 @@ class Logman {
   /// [showOverlay] is optional and true by default, if set to false,
   /// the overlay will not be displayed
   ///
-  /// [maxLogLifetime] is optional and set to 10 minutes by default,
-  /// it defines the maximum lifetime of a single log record
+  /// [maxLogLifetime] is optional, it defines the maximum lifetime
+  /// of a single log record
   ///
-  /// [maxLogCount] is optional and set to 100 by default, it defines
-  /// the maximum number of log records to keep
+  /// [maxLogCount] is optional, it defines the maximum number of
+  /// log records to keep
   void attachOverlay({
     required BuildContext context,
     Widget? button,
