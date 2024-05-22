@@ -20,7 +20,14 @@ class NetworkLogmanRecord extends LogmanRecord {
 
   @override
   String toString() {
-    return '';
+    return 'NetworkRequestLogmanRecord(request: $request, response: $response)';
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'request': request.toJson(),
+      'response': response?.toJson(),
+    };
   }
 }
 
@@ -47,9 +54,20 @@ class NetworkRequestLogmanRecord {
 
   String toReadableString() {
     final readableJson =
-        '{url: $url, method: $method, headers: ${headers ?? ''}, body: ${body ?? ''}, sentAt: $sentAt}'
-            .formatJson();
+    '{url: $url, method: $method, headers: ${headers ?? ''}, body: ${body ?? ''}, sentAt: $sentAt}'
+        .formatJson();
     return 'NetworkRequestLogmanRecord $readableJson';
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'url': url,
+      'method': method,
+      'headers': headers,
+      'body': body,
+      'sentAt': sentAt?.toIso8601String(),
+    };
   }
 }
 
@@ -74,8 +92,18 @@ class NetworkResponseLogmanRecord {
 
   String toReadableString() {
     final readableJson =
-        '{statusCode: $statusCode, headers: ${headers ?? ''}, body: ${body ?? ''}, receivedAt: $receivedAt}'
-            .formatJson();
+    '{statusCode: $statusCode, headers: ${headers ?? ''}, body: ${body ?? ''}, receivedAt: $receivedAt}'
+        .formatJson();
     return 'NetworkResponseLogmanRecord $readableJson';
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'statusCode': statusCode,
+      'headers': headers,
+      'body': body,
+      'receivedAt': receivedAt?.toIso8601String(),
+    };
   }
 }

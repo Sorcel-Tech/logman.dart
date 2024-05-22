@@ -10,4 +10,17 @@ class SimpleLogmanRecord extends LogmanRecord {
     required this.source,
     this.isError = false,
   }) : super(LogmanRecordType.simple);
+
+  @override
+  String toString() {
+    return 'SimpleLogmanRecord(message: $message, source: $source, isError: $isError)';
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+      'source': source,
+      'isError': isError,
+    };
+  }
 }
