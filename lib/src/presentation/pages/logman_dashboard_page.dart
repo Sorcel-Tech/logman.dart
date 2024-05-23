@@ -3,7 +3,7 @@ import 'package:logman/logman.dart';
 import 'package:logman/src/presentation/notifier/notifier.dart';
 import 'package:logman/src/presentation/presentation.dart';
 
-enum NetworkStatus { all, error, success }
+enum NetworkStatus { all, error, failed, success }
 
 class LogmanDashboardPage extends StatefulWidget {
   final Widget? debugPage;
@@ -48,8 +48,9 @@ class _LogmanDashboardPageState extends State<LogmanDashboardPage>
   void initState() {
     super.initState();
     // Get all NetworkLogmanRecords from logman record list
-    final networkRecords =
-        widget.logman.records.value.whereType<NetworkLogmanRecord>().toList();
+    final networkRecords = widget.logman.records.value
+        .whereType<NetworkLogmanRecord>()
+        .toList();
 
     _recordNotifier = NetworkRecordNotifier(networkRecords);
   }
@@ -71,8 +72,7 @@ class _LogmanDashboardPageState extends State<LogmanDashboardPage>
           controller: _tabController,
           isScrollable: true,
           tabAlignment: TabAlignment.center,
-          onTap: (value) =>
-              setState(() => currentIndex = value), // Update currentIndex value
+          onTap: (value) => setState(() => currentIndex = value), // Update currentIndex value
           tabs: [
             const Tab(text: 'All'),
             const Tab(text: 'Logs'),
@@ -167,6 +167,10 @@ class _NetworkFilterButtonState extends State<_NetworkFilterButton> {
             title: 'Error',
             color: Colors.red,
           ),
+        ),
+        PopupMenuItem(
+          value: NetworkStatus.failed,
+          child: filterPopupButton(icon: Icons.public_off, title: 'Filed'),
         ),
         PopupMenuItem(
           value: NetworkStatus.success,
