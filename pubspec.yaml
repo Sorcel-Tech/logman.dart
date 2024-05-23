@@ -1,6 +1,6 @@
 name: logman
 description: A simple yet powerful logging package for Flutter apps with an integrated UI and an optional debug page.
-version: 0.0.14
+version: 0.0.17
 homepage: https://github.com/Sorcel-Tech/logman.dart
 
 environment:
@@ -10,8 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  intl: ^0.18.1
-  logger: ^2.0.2+1
+  intl: ^0.19.0
+  logger: ^2.3.0
 
 dev_dependencies:
   flutter_lints: ^2.0.0
