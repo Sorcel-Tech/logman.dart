@@ -10,7 +10,6 @@ class NetworkRecordsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return ValueListenableBuilder<List<NetworkLogmanRecord>>(
       valueListenable: networkRecordNotifier,
       builder: (context, networkRecords, child) {
