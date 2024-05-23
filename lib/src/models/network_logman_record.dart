@@ -54,8 +54,8 @@ class NetworkRequestLogmanRecord {
 
   String toReadableString() {
     final readableJson =
-    '{url: $url, method: $method, headers: ${headers ?? ''}, body: ${body ?? ''}, sentAt: $sentAt}'
-        .formatJson();
+        '{url: $url, method: $method, headers: ${headers ?? ''}, body: ${body ?? ''}, sentAt: $sentAt}'
+            .formatJson();
     return 'NetworkRequestLogmanRecord $readableJson';
   }
 
@@ -92,8 +92,8 @@ class NetworkResponseLogmanRecord {
 
   String toReadableString() {
     final readableJson =
-    '{statusCode: $statusCode, headers: ${headers ?? ''}, body: ${body ?? ''}, receivedAt: $receivedAt}'
-        .formatJson();
+        '{statusCode: $statusCode, headers: ${headers ?? ''}, body: ${body ?? ''}, receivedAt: $receivedAt}'
+            .formatJson();
     return 'NetworkResponseLogmanRecord $readableJson';
   }
 
