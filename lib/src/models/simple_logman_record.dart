@@ -13,6 +13,14 @@ class SimpleLogmanRecord extends LogmanRecord {
 
   @override
   String toString() {
-    return 'SimpleLogmanRecord (message: $message, source: $source, isError: $isError)';
+    return 'SimpleLogmanRecord(message: $message, source: $source, isError: $isError)';
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+      'source': source,
+      'isError': isError,
+    };
   }
 }
