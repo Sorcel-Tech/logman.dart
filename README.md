@@ -90,5 +90,9 @@ Find a complete example [here](https://github.com/Sorcel-Tech/logman.dart/blob/m
 ## Contributing
 We welcome contributions! Please read our contribution guidelines for more information.
 
+**Find this useful? Give our repo a star :star: :arrow_up:.**
+
+[![Stargazers repo roster for @Sorcel-Tech/logman.dart](https://reporoster.com/stars/Sorcel-Tech/logman.dart)](https://github.com/Sorcel-Tech/logman.dart/stargazers)
+
 ## License
 Logman is released under the Apache 2.0 License.
