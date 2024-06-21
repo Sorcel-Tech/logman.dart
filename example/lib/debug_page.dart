@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:example/main.dart';
 import 'package:flutter/material.dart';
 import 'package:logman/logman.dart';
@@ -35,7 +37,9 @@ class DebugPage extends StatelessWidget {
           ),
           ListTile(
             title: const Text('Force Crash app'),
-            onTap: () {},
+            onTap: () {
+              exit(0);
+            },
           ),
           ListTile(
             title: const Text('Log out'),
