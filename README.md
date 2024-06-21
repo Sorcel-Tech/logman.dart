@@ -53,9 +53,29 @@ void initState() {
          context: context,
          debugPage: // Your optional debug page,
          button: // Your optional custom button,
+         maxLogLifetime: // Set the maximum lifetime of a single log record,
+         maxLogCount: // Set the maximum number of log records to keep,
       );
    });
 }
+```
+
+You can also hide the overlay using the showOverlay property like so.
+```
+logman.attachOverlay(
+    context: context,
+    showOverlay: false,
+);
+```
+
+This can be useful when you want to hide the overlay in production. Also you can also disable logs 
+using the printLogs property like so.
+
+```
+logman.attachOverlay(
+    context: context,
+    printLogs: false,
+);
 ```
 
 2. Log events
