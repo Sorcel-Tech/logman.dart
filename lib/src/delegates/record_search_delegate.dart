@@ -43,7 +43,7 @@ class RecordSearchDelegate extends SearchDelegate<LogmanRecord> {
   Widget buildResults(BuildContext context) {
     final searchRecords = _likeSearch(records);
 
-    return _searchRecordListView(searchRecords);;
+    return _searchRecordListView(searchRecords);
   }
 
   @override
