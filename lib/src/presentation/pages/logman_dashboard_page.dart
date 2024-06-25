@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logman/logman.dart';
+import 'package:logman/src/delegates/delegates.dart';
 import 'package:logman/src/presentation/notifier/notifier.dart';
 import 'package:logman/src/presentation/presentation.dart';
 
@@ -71,8 +72,8 @@ class _LogmanDashboardPageState extends State<LogmanDashboardPage>
           controller: _tabController,
           isScrollable: true,
           tabAlignment: TabAlignment.center,
-          onTap: (value) =>
-              setState(() => currentIndex = value), // Update currentIndex value
+          onTap: (value) => setState(() => currentIndex = value),
+          // Update currentIndex value
           tabs: [
             const Tab(text: 'All'),
             const Tab(text: 'Logs'),
@@ -82,20 +83,19 @@ class _LogmanDashboardPageState extends State<LogmanDashboardPage>
           ],
         ),
         actions: [
+          IconButton(
+            onPressed: () => showSearch(
+              context: context,
+              delegate: RecordSearchDelegate(
+                records: widget.logman.records.value,
+              ),
+            ),
+            icon: const Icon(Icons.search_rounded),
+          ),
           // Only show these action widgets when network tab is active
           Visibility(
             visible: currentIndex == 2,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // todo implement search functionality
-                /*IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.search_rounded),
-                ),*/
-                _NetworkFilterButton(recordsNotifier: _recordNotifier),
-              ],
-            ),
+            child: _NetworkFilterButton(recordsNotifier: _recordNotifier),
           ),
           IconButton(
             onPressed: () {
