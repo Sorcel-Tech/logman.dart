@@ -37,7 +37,10 @@ class _MyHomePageState extends State<MyHomePage> {
       var tempDir = await getTemporaryDirectory();
       String savePath = '${tempDir.path}/downloaded_file.txt';
 
-      await dio.download('https://storage.googleapis.com/cms-storage-bucket/c823e53b3a1a7b0d36a9.png', savePath);
+      await dio.download(
+        'https://storage.googleapis.com/cms-storage-bucket/c823e53b3a1a7b0d36a9.png',
+        savePath,
+      );
       logman.info('File downloaded to $savePath');
 
       final formData = FormData.fromMap({
