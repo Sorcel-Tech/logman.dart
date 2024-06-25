@@ -31,6 +31,30 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Future<void> mockFormDataRequest() async {
+    try {
+      final formData = FormData.fromMap({
+        'title': 'foo',
+        'body': 'bar',
+        'userId': 1,
+      });
+
+      final response = await dio.post(
+        'https://jsonplaceholder.typicode.com/posts',
+        data: formData,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+        ),
+      );
+
+      posts.add(PostModel.fromJson(response.data));
+    } catch (e) {
+      logman.error(e.toString());
+    }
+  }
+
   Future<void> getItems() async {
     final response = await dio.get(
       'https://jsonplaceholder.typicode.com/posts',
@@ -52,6 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     getItems();
     mockNetworkCallFailure();
+    mockFormDataRequest();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       logman.attachOverlay(
         context: context,
