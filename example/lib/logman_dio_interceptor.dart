@@ -86,8 +86,21 @@ class LogmanDioInterceptor extends Interceptor {
 
   String readFormData(FormData formData) {
     Map<String, dynamic> formDataMap = {};
+
+    // Add form data field to formDataMap
     for (var field in formData.fields) {
       formDataMap[field.key] = field.value;
+    }
+
+    // Add form data files to formDataMap
+    for (var field in formData.files) {
+      MultipartFile file = field.value;
+      formDataMap[field.key] = {
+        'filename': file.filename,
+        'length': file.length,
+        'contentType': file.contentType.toString(),
+        'headers': file.headers
+      };
     }
 
     // Convert the map to a formatted JSON string
