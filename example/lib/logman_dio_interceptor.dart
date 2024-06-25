@@ -77,7 +77,20 @@ class LogmanDioInterceptor extends Interceptor {
     } else if (data is List) {
       return jsonEncode(data);
     } else {
+      if (data is FormData) {
+        return readFormData(data);
+      }
       return data.toString();
     }
+  }
+
+  String readFormData(FormData formData) {
+    Map<String, dynamic> formDataMap = {};
+    for (var field in formData.fields) {
+      formDataMap[field.key] = field.value;
+    }
+
+    // Convert the map to a formatted JSON string
+    return jsonEncode(formDataMap);
   }
 }
