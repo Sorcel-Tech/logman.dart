@@ -4,6 +4,7 @@ import 'package:example/logman_dio_interceptor.dart';
 import 'package:example/second_page.dart';
 import 'package:flutter/material.dart';
 import 'package:logman/logman.dart';
+import 'package:path_provider/path_provider.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -31,6 +32,44 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Future<void> mockFormDataRequest() async {
+    try {
+      var tempDir = await getTemporaryDirectory();
+      String savePath = '${tempDir.path}/downloaded_file.txt';
+
+      await dio.download(
+        'https://storage.googleapis.com/cms-storage-bucket/c823e53b3a1a7b0d36a9.png',
+        savePath,
+      );
+      logman.info('File downloaded to $savePath');
+
+      final formData = FormData.fromMap({
+        'title': 'foo',
+        'body': 'bar',
+        'userId': 1,
+        // Add file to the form data
+        'profile_picture': await MultipartFile.fromFile(
+          savePath,
+          filename: 'FlutterLogo.png',
+        ),
+      });
+
+      final response = await dio.post(
+        'https://jsonplaceholder.typicode.com/posts',
+        data: formData,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+        ),
+      );
+
+      posts.add(PostModel.fromJson(response.data));
+    } catch (e) {
+      logman.error(e.toString());
+    }
+  }
+
   Future<void> getItems() async {
     final response = await dio.get(
       'https://jsonplaceholder.typicode.com/posts',
@@ -52,6 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     getItems();
     mockNetworkCallFailure();
+    mockFormDataRequest();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       logman.attachOverlay(
         context: context,
