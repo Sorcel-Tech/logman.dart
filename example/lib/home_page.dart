@@ -27,9 +27,6 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (e) {
       logman.error(e.toString());
     }
-    await dio.get(
-      'https://jsonplaceholder.typicode.com/posts/1',
-    );
   }
 
   Future<void> mockFormDataRequest() async {
@@ -86,12 +83,16 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {});
   }
 
+  fetch() async {
+    await getItems();
+    await mockNetworkCallFailure();
+    await mockFormDataRequest();
+  }
+
   @override
   void initState() {
     super.initState();
-    getItems();
-    mockNetworkCallFailure();
-    mockFormDataRequest();
+    fetch();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       logman.attachOverlay(
         context: context,

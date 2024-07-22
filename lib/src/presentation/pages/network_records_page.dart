@@ -22,7 +22,7 @@ class NetworkRecordsPage extends StatelessWidget {
         return ListView.separated(
           itemCount: networkRecords.length,
           itemBuilder: (context, index) {
-            final networkRecord = networkRecords[index];
+            final networkRecord = networkRecords.reversed.toList()[index];
             return NetworkRecordItem(record: networkRecord);
           },
           separatorBuilder: (context, index) => const CustomDivider(),
