@@ -77,6 +77,7 @@ class NetworkResponseLogmanRecord {
   final Map<String, String>? headers;
   final String? body;
   final DateTime? receivedAt;
+  final String url;
 
   NetworkResponseLogmanRecord({
     required this.id,
@@ -84,6 +85,7 @@ class NetworkResponseLogmanRecord {
     required this.headers,
     required this.body,
     this.receivedAt,
+    required this.url,
   });
 
   String get dateFormatted => receivedAt == null
@@ -104,6 +106,7 @@ class NetworkResponseLogmanRecord {
       'headers': headers,
       'body': body,
       'receivedAt': receivedAt?.toIso8601String(),
+      'url': url,
     };
   }
 }

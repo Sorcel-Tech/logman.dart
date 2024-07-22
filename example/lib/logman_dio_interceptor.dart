@@ -13,7 +13,7 @@ class LogmanDioInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    final requestId = UniqueKey().toString();
+    final requestId = UniqueKey().hashCode.toRadixString(16);
     _cache[options] = requestId;
     final sentAt = DateTime.now();
 
@@ -44,6 +44,7 @@ class LogmanDioInterceptor extends Interceptor {
       headers: responseHeaders,
       body: dataToString(response.data),
       receivedAt: receivedAt,
+      url: response.requestOptions.uri.toString(),
     );
 
     _logman.networkResponse(responseRecord);
@@ -64,6 +65,7 @@ class LogmanDioInterceptor extends Interceptor {
       headers: responseHeaders,
       body: dataToString(err.response?.data),
       receivedAt: DateTime.now(),
+      url: err.requestOptions.uri.toString(),
     );
 
     _logman.networkResponse(responseRecord);

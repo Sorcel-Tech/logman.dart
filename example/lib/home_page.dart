@@ -101,6 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
           onPressed: () {},
           child: const Icon(Icons.bug_report),
         ),
+        printLogs: true,
       );
     });
   }
@@ -114,24 +115,31 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: posts.isEmpty
           ? const Center(child: CircularProgressIndicator())
-          : ListView.separated(
-              itemCount: posts.length,
-              itemBuilder: (context, index) {
-                final post = posts[index];
-                return ListTile(
-                  title: Text(post.title),
-                  subtitle: Text(post.body),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const SecondPage(),
-                        settings: const RouteSettings(name: '/second-page'),
-                      ),
-                    );
-                  },
-                );
+          : RefreshIndicator(
+              onRefresh: () async {
+                await getItems();
+                mockNetworkCallFailure();
+                mockFormDataRequest();
               },
-              separatorBuilder: (context, index) => const Divider(),
+              child: ListView.separated(
+                itemCount: posts.length,
+                itemBuilder: (context, index) {
+                  final post = posts[index];
+                  return ListTile(
+                    title: Text(post.title),
+                    subtitle: Text(post.body),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const SecondPage(),
+                          settings: const RouteSettings(name: '/second-page'),
+                        ),
+                      );
+                    },
+                  );
+                },
+                separatorBuilder: (context, index) => const Divider(),
+              ),
             ),
     );
   }

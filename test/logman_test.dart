@@ -68,6 +68,7 @@ void main() {
         statusCode: 200,
         headers: {'Content-Type': 'application/json'},
         body: {'name': 'John Doe'}.toString(),
+        url: 'https://example.com',
       );
       logman.networkResponse(record);
       expect(logman.records.value.isNotEmpty, true);
