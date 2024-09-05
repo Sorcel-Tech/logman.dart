@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:logman/logman.dart';
 import 'package:logman/src/presentation/presentation.dart';
@@ -32,10 +30,7 @@ class RecordSearchDelegate extends SearchDelegate<LogmanRecord> {
     // Back button
     return IconButton(
       onPressed: () => Navigator.pop(context),
-      icon: Icon(
-        Platform.isIOS ? Icons.arrow_back_ios_new : Icons.arrow_back,
-        size: 16,
-      ),
+      icon: const BackButtonIcon(),
     );
   }
 
