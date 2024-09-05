@@ -30,13 +30,13 @@ Replace [latest_version] with the latest version of Logman.
 
 2. Install it:
 
-```
+```dart
 flutter packages get
 ```
 
 3. Import it in your Dart code:
 
-```
+```dart
 import 'package:logman/logman.dart';
 ```
 ## Usage
@@ -61,7 +61,7 @@ void initState() {
 ```
 
 You can also hide the overlay using the showOverlay property like so.
-```
+```dart
 logman.attachOverlay(
     context: context,
     showOverlay: false,
@@ -71,10 +71,11 @@ logman.attachOverlay(
 This can be useful when you want to hide the overlay in production. Also you can also disable logs 
 using the printLogs property like so.
 
-```
+```dart
 logman.attachOverlay(
     context: context,
     printLogs: false,
+    recordLogs: false,
 );
 ```
 
