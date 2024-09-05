@@ -9,12 +9,12 @@ class NavigationRecordsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final simpleRecords = List<LogmanRecord>.from(records)
+    final navigationRecords = List<LogmanRecord>.from(records)
       ..retainWhere(
         (element) => element is NavigationLogmanRecord,
       );
 
-    if (simpleRecords.isEmpty) {
+    if (navigationRecords.isEmpty) {
       return const Center(
         child: Text(
           'No Navigation logs recorded yet. Check your navigation observer!',
@@ -23,9 +23,9 @@ class NavigationRecordsPage extends StatelessWidget {
     }
 
     return ListView.separated(
-      itemCount: simpleRecords.length,
+      itemCount: navigationRecords.length,
       itemBuilder: (context, index) {
-        final record = simpleRecords[index] as NavigationLogmanRecord;
+        final record = navigationRecords[index] as NavigationLogmanRecord;
         return NavigationRecordItem(record: record);
       },
       separatorBuilder: (context, index) => const CustomDivider(),

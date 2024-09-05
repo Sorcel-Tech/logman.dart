@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 import 'package:logman/logman.dart';
 import 'package:logman/src/presentation/presentation.dart';
@@ -33,6 +34,12 @@ class Logman {
   /// If `true`, logs are printed to the console using the internal logger.
   /// This can be toggled to disable console logging for production.
   bool printLogs = true;
+
+  /// Whether logs should be recorded.
+  ///
+  /// If `true`, [Logman] records the logs.
+  /// If `false`, [Logman] ignores the logs totally (this can be useful in prod).
+  bool recordLogs = true;
 
   /// Maximum duration for which logs should be retained in memory.
   ///
@@ -95,6 +102,7 @@ class Logman {
   /// Parameters:
   /// - `record`: The `LogmanRecord` instance representing the new log entry to add.
   void _addRecord(LogmanRecord record) {
+    if (!recordLogs) return;
     try {
       _records.value = [..._records.value, record];
       _rotateRecords();
@@ -137,7 +145,9 @@ class Logman {
     _addRecord(
       SimpleLogmanRecord(
         message: message,
-        source: StackTrace.current.traceSource,
+        source: kIsWeb
+            ? StackTrace.current.extractSourceFromLine(2)
+            : StackTrace.current.traceSource,
       ),
     );
     if (printLogs) _logger.i(message.shorten());
@@ -145,10 +155,11 @@ class Logman {
 
   /// Records a simple log message.
   void error(Object error, {StackTrace? stackTrace}) {
+    final StackTrace trace = stackTrace ?? StackTrace.current;
     _addRecord(
       SimpleLogmanRecord(
         message: error.toString(),
-        source: stackTrace?.traceSource ?? StackTrace.current.traceSource,
+        source: kIsWeb ? trace.extractSourceFromLine(2) : trace.traceSource,
         isError: true,
       ),
     );
@@ -214,6 +225,9 @@ class Logman {
   ///
   /// [maxLogCount] is optional, it defines the maximum number of
   /// log records to keep
+  ///
+  /// [recordLogs] is optional and true by default, if set to false,
+  /// logs will not be recorded
   void attachOverlay({
     required BuildContext context,
     Widget? button,
@@ -222,6 +236,7 @@ class Logman {
     bool showOverlay = true,
     Duration? maxLogLifetime,
     int? maxLogCount,
+    bool? recordLogs,
   }) {
     this.printLogs = printLogs;
     if (maxLogLifetime != null) {
@@ -237,10 +252,27 @@ class Logman {
 
     if (!showOverlay) return;
 
+    if (recordLogs != null) this.recordLogs = recordLogs;
+
     return LogmanOverlay.attachOverlay(
       context: context,
       logman: this,
       button: button,
+      debugPage: debugPage,
+    );
+  }
+
+  /// Opens the Logman dashboard.
+  /// This can be useful when you don't want to use the overlay but
+  /// you want to open the dashboard manually using another widget
+  /// Or if you want to open he dashboard on device shake.
+  ///
+  /// [context] is required, the current context of the application
+  /// [debugPage] is optional. You can see an example of this in the example app
+  Future<void> openDashboard(BuildContext context, {Widget? debugPage}) {
+    return LogmanDashboardPage.push(
+      context,
+      logman: this,
       debugPage: debugPage,
     );
   }

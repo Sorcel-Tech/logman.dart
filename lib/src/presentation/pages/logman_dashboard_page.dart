@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logman/logman.dart';
 import 'package:logman/src/delegates/delegates.dart';
-import 'package:logman/src/presentation/notifier/notifier.dart';
 import 'package:logman/src/presentation/presentation.dart';
 
 enum NetworkStatus { all, error, success }
@@ -87,7 +86,7 @@ class _LogmanDashboardPageState extends State<LogmanDashboardPage>
             onPressed: () => showSearch(
               context: context,
               delegate: RecordSearchDelegate(
-                records: widget.logman.records.value,
+                records: widget.logman.records.value.reversed.toList(),
               ),
             ),
             icon: const Icon(Icons.search_rounded),
