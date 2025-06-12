@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:example/debug_page.dart';
-import 'package:example/logman_dio_interceptor.dart';
+import 'package:example/interceptors/logman_dio_interceptor.dart';
 import 'package:example/second_page.dart';
 import 'package:flutter/material.dart';
 import 'package:logman/logman.dart';
