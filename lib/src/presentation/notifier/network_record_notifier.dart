@@ -18,7 +18,6 @@ class NetworkRecordNotifier extends ValueNotifier<List<NetworkLogmanRecord>> {
         case NetworkStatus.error:
           return _isErrorStatusCode(networkRecord);
         case NetworkStatus.all:
-        default:
           return true;
       }
     }).toList();

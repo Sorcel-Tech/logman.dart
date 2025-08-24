@@ -12,8 +12,8 @@ class SimpleRecordItem extends StatelessWidget {
       title: Row(
         children: [
           Icon(
-            record.isError ? Icons.error : Icons.info_outline,
-            color: record.isError ? Colors.red : null,
+            record.level.icon,
+            color: record.level.color,
             size: 17.0,
           ),
           const SizedBox(width: 8.0),
@@ -31,6 +31,51 @@ class SimpleRecordItem extends StatelessWidget {
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: record.level.color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                    color: record.level.color.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Text(
+                  record.level.name,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: record.level.color,
+                  ),
+                ),
+              ),
+              if (record.tag != null) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(
+                      color: Colors.blue.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Text(
+                    record.tag!,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 4),
           Text(
             record.message,
             maxLines: 3,

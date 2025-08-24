@@ -27,6 +27,7 @@ class Logman {
   Logman._internal() {
     _logger = Logger();
     _startRotationTimer();
+    _startBatchProcessTimer();
   }
 
   /// Whether logs should be printed to the console.
@@ -40,6 +41,29 @@ class Logman {
   /// If `true`, [Logman] records the logs.
   /// If `false`, [Logman] ignores the logs totally (this can be useful in prod).
   bool recordLogs = true;
+
+  /// Minimum log level to record and display.
+  ///
+  /// Logs below this level will be ignored.
+  LogLevel minLogLevel = LogLevel.verbose;
+
+  /// Whether to process logs in background to improve performance.
+  bool enableBackgroundProcessing = true;
+
+  /// Queue for background log processing.
+  final List<Map<String, dynamic>> _logQueue = [];
+
+  /// Timer for batch processing logs.
+  Timer? _batchProcessTimer;
+
+  /// Duration for batch processing interval.
+  Duration batchProcessInterval = const Duration(milliseconds: 100);
+
+  /// Maximum number of logs to process in a single batch.
+  int maxBatchSize = 50;
+
+  /// Memory threshold (in MB) after which aggressive cleanup is triggered.
+  int memoryThresholdMB = 100;
 
   /// Maximum duration for which logs should be retained in memory.
   ///
@@ -103,6 +127,29 @@ class Logman {
   /// - `record`: The `LogmanRecord` instance representing the new log entry to add.
   void _addRecord(LogmanRecord record) {
     if (!recordLogs) return;
+
+    if (enableBackgroundProcessing) {
+      _queueLogForProcessing(record);
+    } else {
+      _processLogRecord(record);
+    }
+  }
+
+  /// Queues a log record for background processing.
+  void _queueLogForProcessing(LogmanRecord record) {
+    _logQueue.add({
+      'record': record,
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
+    });
+
+    // If queue is full, process immediately
+    if (_logQueue.length >= maxBatchSize) {
+      _processBatch();
+    }
+  }
+
+  /// Processes a log record immediately.
+  void _processLogRecord(LogmanRecord record) {
     try {
       _records.value = [..._records.value, record];
       _rotateRecords();
@@ -141,29 +188,76 @@ class Logman {
   }
 
   /// Records a simple log message.
-  void info(String message) {
-    _addRecord(
-      SimpleLogmanRecord(
-        message: message,
-        source: kIsWeb
-            ? StackTrace.current.extractSourceFromLine(2)
-            : StackTrace.current.traceSource,
-      ),
-    );
-    if (printLogs) _logger.i(message.shorten());
+  void info(String message, {String? tag, Map<String, dynamic>? metadata}) {
+    _log(LogLevel.info, message, tag: tag, metadata: metadata);
   }
 
   /// Records a simple log message.
-  void error(Object error, {StackTrace? stackTrace}) {
-    final StackTrace trace = stackTrace ?? StackTrace.current;
+  void error(
+    Object error, {
+    StackTrace? stackTrace,
+    String? tag,
+    Map<String, dynamic>? metadata,
+  }) {
+    _log(
+      LogLevel.error,
+      error.toString(),
+      tag: tag,
+      metadata: metadata,
+      stackTrace: stackTrace,
+    );
+  }
+
+  /// Records a warning log message.
+  void warn(String message, {String? tag, Map<String, dynamic>? metadata}) {
+    _log(LogLevel.warn, message, tag: tag, metadata: metadata);
+  }
+
+  /// Records a debug log message.
+  void debug(String message, {String? tag, Map<String, dynamic>? metadata}) {
+    _log(LogLevel.debug, message, tag: tag, metadata: metadata);
+  }
+
+  /// Records a verbose log message.
+  void verbose(String message, {String? tag, Map<String, dynamic>? metadata}) {
+    _log(LogLevel.verbose, message, tag: tag, metadata: metadata);
+  }
+
+  /// Internal method to handle logging with levels.
+  void _log(
+    LogLevel level,
+    String message, {
+    String? tag,
+    Map<String, dynamic>? metadata,
+    StackTrace? stackTrace,
+  }) {
+    if (!level.shouldLog(minLogLevel)) return;
+
+    final trace = stackTrace ?? StackTrace.current;
     _addRecord(
       SimpleLogmanRecord(
-        message: error.toString(),
-        source: kIsWeb ? trace.extractSourceFromLine(2) : trace.traceSource,
-        isError: true,
+        message: message,
+        source: kIsWeb ? trace.extractSourceFromLine(3) : trace.traceSource,
+        level: level,
+        tag: tag,
+        metadata: metadata,
       ),
     );
-    if (printLogs) _logger.e(error.toString().shorten());
+
+    if (printLogs) {
+      switch (level) {
+        case LogLevel.verbose:
+          _logger.t(message.shorten());
+        case LogLevel.debug:
+          _logger.d(message.shorten());
+        case LogLevel.info:
+          _logger.i(message.shorten());
+        case LogLevel.warn:
+          _logger.w(message.shorten());
+        case LogLevel.error:
+          _logger.e(message.shorten());
+      }
+    }
   }
 
   /// Records navigation events in the application.
@@ -285,5 +379,168 @@ class Logman {
   /// Stops the log rotation timer.
   void stopTimer() {
     _rotationTimer?.cancel();
+    _batchProcessTimer?.cancel();
+  }
+
+  /// Starts the batch processing timer.
+  void _startBatchProcessTimer() {
+    _batchProcessTimer?.cancel();
+    _batchProcessTimer = Timer.periodic(batchProcessInterval, (timer) {
+      if (_logQueue.isNotEmpty) {
+        _processBatch();
+      }
+    });
+  }
+
+  /// Processes a batch of queued logs.
+  void _processBatch() {
+    if (_logQueue.isEmpty) return;
+
+    try {
+      final batchToProcess = _logQueue.take(maxBatchSize).toList();
+      _logQueue.removeRange(
+        0,
+        batchToProcess.length.clamp(0, _logQueue.length),
+      );
+
+      final newRecords =
+          batchToProcess.map((item) => item['record'] as LogmanRecord).toList();
+
+      _records.value = [..._records.value, ...newRecords];
+      _rotateRecords();
+
+      // Check memory usage and trigger cleanup if needed
+      _checkMemoryUsage();
+    } catch (e) {
+      _logger.e('Error processing log batch: $e');
+    }
+  }
+
+  /// Checks memory usage and triggers cleanup if threshold is exceeded.
+  void _checkMemoryUsage() {
+    // Estimate memory usage (rough calculation)
+    final recordCount = _records.value.length;
+    final estimatedMemoryMB =
+        (recordCount * 0.5) / 1024; // Rough estimate: 0.5KB per record
+
+    if (estimatedMemoryMB > memoryThresholdMB) {
+      _performAggressiveCleanup();
+    }
+  }
+
+  /// Performs aggressive memory cleanup.
+  void _performAggressiveCleanup() {
+    final records = _records.value;
+    final targetCount = (maxLogCount ?? 1000) ~/ 2; // Keep only half
+
+    if (records.length > targetCount) {
+      final remainingRecords = records.sublist(records.length - targetCount);
+      _records.value = remainingRecords;
+
+      if (printLogs) {
+        _logger.i(
+          'Performed aggressive memory cleanup, kept $targetCount most recent logs',
+        );
+      }
+    }
+  }
+
+  /// Configures background processing settings.
+  void configureBackgroundProcessing({
+    bool? enabled,
+    Duration? batchInterval,
+    int? batchSize,
+    int? memoryThreshold,
+  }) {
+    if (enabled != null) enableBackgroundProcessing = enabled;
+    if (batchInterval != null) {
+      batchProcessInterval = batchInterval;
+      _startBatchProcessTimer();
+    }
+    if (batchSize != null) maxBatchSize = batchSize;
+    if (memoryThreshold != null) memoryThresholdMB = memoryThreshold;
+  }
+
+  /// Forces processing of all queued logs.
+  void flushLogQueue() {
+    while (_logQueue.isNotEmpty) {
+      _processBatch();
+    }
+  }
+
+  /// Shorthand for [error] method.
+  void e(
+    Object error, {
+    StackTrace? stackTrace,
+    String? tag,
+    Map<String, dynamic>? metadata,
+  }) =>
+      this.error(error, stackTrace: stackTrace, tag: tag, metadata: metadata);
+
+  /// Shorthand for [info] method.
+  void i(String message, {String? tag, Map<String, dynamic>? metadata}) =>
+      info(message, tag: tag, metadata: metadata);
+
+  /// Shorthand for [warn] method.
+  void w(String message, {String? tag, Map<String, dynamic>? metadata}) =>
+      warn(message, tag: tag, metadata: metadata);
+
+  /// Shorthand for [debug] method.
+  void d(String message, {String? tag, Map<String, dynamic>? metadata}) =>
+      debug(message, tag: tag, metadata: metadata);
+
+  /// Shorthand for [verbose] method.
+  void v(String message, {String? tag, Map<String, dynamic>? metadata}) =>
+      verbose(message, tag: tag, metadata: metadata);
+
+  /// Sets the minimum log level.
+  void setMinLogLevel(LogLevel level) {
+    minLogLevel = level;
+  }
+
+  /// Gets all records filtered by log level.
+  List<LogmanRecord> getRecordsByLevel(LogLevel minLevel) {
+    return _records.value.where((record) {
+      if (record is SimpleLogmanRecord) {
+        return record.level.shouldLog(minLevel);
+      }
+      return true; // Include non-simple records
+    }).toList();
+  }
+
+  /// Gets all records filtered by tag.
+  List<LogmanRecord> getRecordsByTag(String tag) {
+    return _records.value.where((record) {
+      if (record is SimpleLogmanRecord) {
+        return record.tag == tag;
+      }
+      return false;
+    }).toList();
+  }
+
+  /// Gets all unique tags from recorded logs.
+  List<String> getAllTags() {
+    final tags = <String>{};
+    for (final record in _records.value) {
+      if (record is SimpleLogmanRecord && record.tag != null) {
+        tags.add(record.tag!);
+      }
+    }
+    return tags.toList()..sort();
+  }
+
+  /// Gets memory usage statistics.
+  Map<String, dynamic> getMemoryStats() {
+    final recordCount = _records.value.length;
+    final queueSize = _logQueue.length;
+    final estimatedMemoryKB = recordCount * 0.5; // Rough estimate
+
+    return {
+      'recordCount': recordCount,
+      'queueSize': queueSize,
+      'estimatedMemoryKB': estimatedMemoryKB,
+      'estimatedMemoryMB': estimatedMemoryKB / 1024,
+      'backgroundProcessingEnabled': enableBackgroundProcessing,
+    };
   }
 }

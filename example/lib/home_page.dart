@@ -25,6 +25,7 @@ class _MyHomePageState extends State<MyHomePage> {
       await dio.get(
           'https://jobs.github.com/positions.json?description=api&location=new+york');
     } catch (e) {
+      logman.w('This is a warning');
       logman.error(e.toString());
     }
   }
