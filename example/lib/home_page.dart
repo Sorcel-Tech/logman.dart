@@ -104,6 +104,11 @@ class _MyHomePageState extends State<MyHomePage> {
           child: const Icon(Icons.bug_report),
         ),
         printLogs: true,
+        security: LogmanSecurity.withPin(
+          '1234',
+          sessionTimeout: Duration(minutes: 15),
+          maxAttempts: 3,
+        ),
       );
     });
   }

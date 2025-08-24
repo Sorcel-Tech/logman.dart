@@ -19,9 +19,19 @@ class LogmanDashboardPage extends StatefulWidget {
     return Navigator.push(
       context,
       MaterialPageRoute<dynamic>(
-        builder: (_) => LogmanDashboardPage(
+        builder: (_) => LogmanSessionManager(
           logman: logman,
-          debugPage: debugPage,
+          onSessionExpired: () {
+            // Auto-close dashboard when session expires
+            Navigator.of(_).pop();
+          },
+          child: withLogmanAuth(
+            logman: logman,
+            child: LogmanDashboardPage(
+              logman: logman,
+              debugPage: debugPage,
+            ),
+          ),
         ),
         fullscreenDialog: true,
         settings: const RouteSettings(name: '/logman-dashboard'),
@@ -55,16 +65,37 @@ class _LogmanDashboardPageState extends State<LogmanDashboardPage>
   }
 
   @override
+  void dispose() {
+    _tabController.dispose();
+    // Auto-logout when dashboard is closed
+    if (widget.logman.requiresAuthentication && widget.logman.isAuthenticated) {
+      widget.logman.logout();
+    }
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text(
-          'Logman',
-          style: TextStyle(
-            fontSize: 20.0,
-            fontWeight: FontWeight.bold,
-          ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Logman',
+              style: TextStyle(
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            if (widget.logman.requiresAuthentication && widget.logman.isAuthenticated)
+              LogmanSessionInfo(
+                logman: widget.logman,
+                textStyle: const TextStyle(fontSize: 10),
+              ),
+          ],
         ),
         centerTitle: true,
         bottom: TabBar(
@@ -124,6 +155,7 @@ class _LogmanDashboardPageState extends State<LogmanDashboardPage>
       ),
     );
   }
+
 }
 
 class _NetworkFilterButton extends StatefulWidget {

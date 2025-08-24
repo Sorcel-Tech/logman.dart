@@ -1,15 +1,36 @@
 # Logman
 
-A simple yet powerful logging package for Flutter apps with an integrated UI and an optional debug page.
+A simple yet powerful logging package for Flutter apps with an integrated UI, advanced log levels, performance optimizations, and optional security features.
 
 ## Features
 
-- Easy-to-use logging with a singleton pattern.
-- Supports various log types: simple, navigation, and network logs.
-- Customizable floating UI overlay to display logs in development.
-- Optional debug page for detailed log analysis.
-- Dio interceptor for network logging.
-- Navigator observer for tracking navigation events.
+### Core Logging
+- Easy-to-use logging with a singleton pattern
+- **5 Log Levels**: `verbose`, `debug`, `info`, `warn`, `error` with priority-based filtering
+- **Tagged Logging**: Organize logs with custom tags and metadata
+- **Shorthand Methods**: `.v()`, `.d()`, `.i()`, `.w()`, `.e()` for quick logging
+- Supports various log types: simple, navigation, and network logs
+
+### Performance & UI
+- **Lazy Loading**: Handle thousands of logs efficiently with pagination
+- **Virtual Scrolling**: Optimized rendering for large log collections
+- **Background Processing**: Batch log processing to prevent UI blocking
+- **Memory Management**: Automatic cleanup with configurable thresholds
+- **Enhanced UI**: Color-coded log levels with modern badges and icons
+- Customizable floating UI overlay to display logs in development
+
+### Security & Authentication
+- **PIN/Password Protection**: Secure access to log data in production
+- **Session Management**: Configurable timeouts and automatic logout
+- **Brute-force Protection**: Failed attempt tracking with lockout periods
+- **Encrypted Storage**: SHA-256 hashing with salt for credentials
+- **Auto-logout**: Sessions expire when dashboard is closed
+
+### Integration
+- Optional debug page for detailed log analysis
+- Dio interceptor for network logging
+- Navigator observer for tracking navigation events
+- Search and filter capabilities across all logs
 
 
 ## Screenshots
@@ -79,20 +100,97 @@ logman.attachOverlay(
 );
 ```
 
-2. Log events
+### Security Configuration
 
-There are 3 types of logs currently (simple , navigation, and network).
+Protect your log data with PIN or password authentication:
 
-For logging simple (info) logs:
+```dart
+// PIN Protection
+logman.attachOverlay(
+    context: context,
+    security: LogmanSecurity.withPin(
+        '1234',
+        sessionTimeout: Duration(minutes: 15),
+        maxAttempts: 5,
+        lockoutDuration: Duration(minutes: 10),
+    ),
+);
 
+// Password Protection
+logman.attachOverlay(
+    context: context,
+    security: LogmanSecurity.withPassword(
+        'mySecurePassword',
+        sessionTimeout: Duration(hours: 1),
+    ),
+);
+```
+
+### Performance Configuration
+
+```dart
+// Configure background processing and memory management
+logman.configureBackgroundProcessing(
+    enabled: true,
+    batchSize: 100,
+    batchInterval: Duration(milliseconds: 200),
+    memoryThreshold: 50, // MB
+);
+
+// Set log retention policies
+logman.attachOverlay(
+    context: context,
+    maxLogLifetime: Duration(hours: 24),
+    maxLogCount: 10000,
+);
+```
+
+2. **Log Events**
+
+### Basic Logging
 ```dart
 final Logman _logman = Logman.instance;
 
-_logman.info('test');
+// Different log levels
+_logman.verbose('Detailed debug information');
+_logman.debug('Debug information');
+_logman.info('General information');
+_logman.warn('Warning message');
+_logman.error('Error occurred');
+
+// Shorthand methods
+_logman.v('Verbose message');
+_logman.d('Debug message');
+_logman.i('Info message');
+_logman.w('Warning message');
+_logman.e('Error message');
 ```
 
-There's a [Dio interceptor ready for use in the example app](https://github.com/Sorcel-Tech/logman.dart/blob/main/example/lib/logman_dio_interceptor.dart).
-Also, Logman ships with a Navigator Observer. You can use it like this in your MaterialApp.
+### Tagged Logging
+```dart
+// Add tags and metadata for better organization
+_logman.info('User logged in', tag: 'AUTH');
+_logman.error('API call failed', 
+  tag: 'NETWORK', 
+  metadata: {'endpoint': '/api/users', 'statusCode': 500}
+);
+```
+
+### Log Level Filtering
+```dart
+// Set minimum log level (ignores logs below this level)
+_logman.setMinLogLevel(LogLevel.warn); // Only show warnings and errors
+
+// Get logs by level or tag
+final warningLogs = _logman.getRecordsByLevel(LogLevel.warn);
+final authLogs = _logman.getRecordsByTag('AUTH');
+```
+
+### Network & Navigation Logging
+
+There's a [Dio interceptor ready for use in the example app](https://github.com/Sorcel-Tech/logman.dart/blob/main/example/lib/interceptors/logman_dio_interceptor.dart).
+
+Logman ships with a Navigator Observer for automatic navigation tracking:
 
 ```dart
 MaterialApp(
@@ -100,13 +198,67 @@ MaterialApp(
   theme: ...,
   home: const MyHomePage(title: 'Logman Demo Home Page'),
   navigatorObservers: [
-    LogmanNavigatorObserver(), // Navigator observer
+    LogmanNavigatorObserver(), // Automatic navigation logging
   ],
 )
 ```
 
-## Example
-Find a complete example [here](https://github.com/Sorcel-Tech/logman.dart/blob/main/example/lib/main.dart). 
+## API Reference
+
+### Log Methods
+- `verbose(String message, {String? tag, Map<String, dynamic>? metadata})`
+- `debug(String message, {String? tag, Map<String, dynamic>? metadata})`
+- `info(String message, {String? tag, Map<String, dynamic>? metadata})`
+- `warn(String message, {String? tag, Map<String, dynamic>? metadata})`
+- `error(Object error, {StackTrace? stackTrace, String? tag, Map<String, dynamic>? metadata})`
+
+### Shorthand Methods
+- `v()`, `d()`, `i()`, `w()`, `e()`
+
+### Configuration Methods
+- `setMinLogLevel(LogLevel level)`
+- `configureSecurity(LogmanSecurity security)`
+- `configureBackgroundProcessing({...})`
+- `getRecordsByLevel(LogLevel level)`
+- `getRecordsByTag(String tag)`
+- `getMemoryStats()`
+
+### Security Methods
+- `authenticate(String credential)`
+- `logout()`
+- `extendSession()`
+
+## Performance Features
+
+### Memory Management
+- **Automatic cleanup** based on configurable thresholds
+- **Background processing** to prevent UI blocking
+- **Lazy loading** for large log collections
+- **Virtual scrolling** for smooth UI performance
+
+### Optimization Tips
+```dart
+// For high-traffic apps, configure aggressive cleanup
+logman.attachOverlay(
+    context: context,
+    maxLogLifetime: Duration(minutes: 30),
+    maxLogCount: 5000,
+);
+
+// Enable background processing for better performance
+logman.configureBackgroundProcessing(
+    enabled: true,
+    batchSize: 50,
+    memoryThreshold: 100, // MB
+);
+```
+
+## Examples
+
+- **Basic Setup**: [main.dart](https://github.com/Sorcel-Tech/logman.dart/blob/main/example/lib/main.dart)
+- **Security Configuration**: [Secure logging example](https://github.com/Sorcel-Tech/logman.dart/blob/main/example/lib/home_page.dart)
+- **Network Logging**: [Dio interceptor](https://github.com/Sorcel-Tech/logman.dart/blob/main/example/lib/interceptors/logman_dio_interceptor.dart)
+- **Custom Debug Page**: [Debug page example](https://github.com/Sorcel-Tech/logman.dart/blob/main/example/lib/debug_page.dart) 
 
 ## Contributing
 We welcome contributions! Please read our contribution guidelines for more information.

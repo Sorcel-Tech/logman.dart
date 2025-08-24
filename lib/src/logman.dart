@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 import 'package:logman/logman.dart';
+import 'package:logman/src/models/logman_security.dart';
 import 'package:logman/src/presentation/presentation.dart';
 
 /// A logging utility class for Flutter applications.
@@ -64,6 +65,15 @@ class Logman {
 
   /// Memory threshold (in MB) after which aggressive cleanup is triggered.
   int memoryThresholdMB = 100;
+
+  /// Security configuration for authentication
+  LogmanSecurity? _security;
+
+  /// Current authentication session
+  LogmanAuthSession? _authSession;
+
+  /// Authentication attempt tracker
+  LogmanAuthAttempts? _authAttempts;
 
   /// Maximum duration for which logs should be retained in memory.
   ///
@@ -322,6 +332,8 @@ class Logman {
   ///
   /// [recordLogs] is optional and true by default, if set to false,
   /// logs will not be recorded
+  ///
+  /// [security] is optional, configures authentication requirements
   void attachOverlay({
     required BuildContext context,
     Widget? button,
@@ -331,6 +343,7 @@ class Logman {
     Duration? maxLogLifetime,
     int? maxLogCount,
     bool? recordLogs,
+    LogmanSecurity? security,
   }) {
     this.printLogs = printLogs;
     if (maxLogLifetime != null) {
@@ -343,10 +356,10 @@ class Logman {
     }
 
     if (maxLogCount != null) this.maxLogCount = maxLogCount;
+    if (recordLogs != null) this.recordLogs = recordLogs;
+    if (security != null) configureSecurity(security);
 
     if (!showOverlay) return;
-
-    if (recordLogs != null) this.recordLogs = recordLogs;
 
     return LogmanOverlay.attachOverlay(
       context: context,
@@ -542,5 +555,114 @@ class Logman {
       'estimatedMemoryMB': estimatedMemoryKB / 1024,
       'backgroundProcessingEnabled': enableBackgroundProcessing,
     };
+  }
+
+  /// Configures security settings for Logman access.
+  ///
+  /// [security] - Security configuration (PIN, password, or none)
+  void configureSecurity(LogmanSecurity security) {
+    _security = security;
+    _authAttempts = LogmanAuthAttempts(
+      maxAttempts: security.maxAttempts,
+      lockoutDuration: security.lockoutDuration,
+    );
+    _authSession = null; // Clear any existing session
+  }
+
+  /// Removes security configuration, making Logman accessible without authentication.
+  void removeSecurity() {
+    _security = null;
+    _authSession = null;
+    _authAttempts = null;
+  }
+
+  /// Checks if authentication is required to access Logman.
+  bool get requiresAuthentication {
+    return _security?.requiresAuth ?? false;
+  }
+
+  /// Checks if user is currently authenticated.
+  bool get isAuthenticated {
+    if (!requiresAuthentication) return true;
+    return _authSession?.isValid ?? false;
+  }
+
+  /// Gets current authentication session info.
+  LogmanAuthSession? get currentSession => _authSession;
+
+  /// Gets authentication attempts info.
+  LogmanAuthAttempts? get authAttempts => _authAttempts;
+
+  /// Gets security configuration.
+  LogmanSecurity? get securityConfig => _security;
+
+  /// Attempts to authenticate with the provided credential.
+  ///
+  /// Returns true if authentication successful, false otherwise.
+  bool authenticate(String credential) {
+    if (_security == null || !_security!.requiresAuth) {
+      return true;
+    }
+
+    // Check if locked out
+    if (_authAttempts?.isLockedOut ?? false) {
+      return false;
+    }
+
+    // Verify credential
+    final isValid = _security!.verifyCredential(credential);
+
+    if (isValid) {
+      // Successful authentication
+      _authSession = LogmanAuthSession(
+        sessionTimeout: _security!.sessionTimeout,
+      );
+      _authAttempts?.reset();
+      return true;
+    } else {
+      // Failed authentication
+      _authAttempts?.recordFailedAttempt();
+      return false;
+    }
+  }
+
+  /// Logs out the current user, invalidating the session.
+  void logout() {
+    _authSession = null;
+  }
+
+  /// Extends the current authentication session.
+  void extendSession() {
+    if (_authSession != null && _security != null) {
+      _authSession = LogmanAuthSession(
+        sessionTimeout: _security!.sessionTimeout,
+      );
+    }
+  }
+
+  /// Checks if currently locked out due to failed attempts.
+  bool get isLockedOut => _authAttempts?.isLockedOut ?? false;
+
+  /// Gets remaining lockout time.
+  Duration get remainingLockoutTime => _authAttempts?.remainingLockoutTime ?? Duration.zero;
+
+  /// Gets remaining attempts before lockout.
+  int get attemptsRemaining => _authAttempts?.attemptsRemaining ?? 0;
+
+  /// Gets authentication type.
+  LogmanAuthType get authType => _security?.authType ?? LogmanAuthType.none;
+
+  /// Internal method to check authentication before accessing sensitive operations.
+  bool _checkAuthentication() {
+    if (!requiresAuthentication) return true;
+    
+    // Check if session is still valid
+    if (_authSession?.isValid ?? false) {
+      return true;
+    }
+    
+    // Session expired, clear it
+    _authSession = null;
+    return false;
   }
 }
