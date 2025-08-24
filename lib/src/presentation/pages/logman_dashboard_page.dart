@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logman/logman.dart';
 import 'package:logman/src/delegates/delegates.dart';
-import 'package:logman/src/presentation/presentation.dart';
 
 enum NetworkStatus { all, error, success }
 
@@ -90,7 +89,8 @@ class _LogmanDashboardPageState extends State<LogmanDashboardPage>
                 fontWeight: FontWeight.bold,
               ),
             ),
-            if (widget.logman.requiresAuthentication && widget.logman.isAuthenticated)
+            if (widget.logman.requiresAuthentication &&
+                widget.logman.isAuthenticated)
               LogmanSessionInfo(
                 logman: widget.logman,
                 textStyle: const TextStyle(fontSize: 10),
@@ -155,7 +155,6 @@ class _LogmanDashboardPageState extends State<LogmanDashboardPage>
       ),
     );
   }
-
 }
 
 class _NetworkFilterButton extends StatefulWidget {

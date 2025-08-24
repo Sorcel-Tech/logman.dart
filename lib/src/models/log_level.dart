@@ -12,10 +12,10 @@ enum LogLevel {
 
   /// Numeric value for comparison and filtering
   final int value;
-  
+
   /// Display name for the log level
   final String name;
-  
+
   /// Associated color for UI display
   final Color color;
 

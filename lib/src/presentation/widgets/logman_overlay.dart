@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:logman/logman.dart';
-import 'package:logman/src/presentation/presentation.dart';
 
 /// A widget that provides an overlay for logging and debugging.
 /// It can attach a draggable floating action button (FAB) to the app's UI.

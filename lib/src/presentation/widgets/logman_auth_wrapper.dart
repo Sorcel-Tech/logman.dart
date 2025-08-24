@@ -30,7 +30,8 @@ class _LogmanAuthWrapperState extends State<LogmanAuthWrapper> {
 
   void _checkAuthentication() {
     // If no authentication required or already authenticated, show child
-    if (!widget.logman.requiresAuthentication || widget.logman.isAuthenticated) {
+    if (!widget.logman.requiresAuthentication ||
+        widget.logman.isAuthenticated) {
       return;
     }
   }
@@ -49,7 +50,7 @@ class _LogmanAuthWrapperState extends State<LogmanAuthWrapper> {
     });
 
     // Simulate network delay for better UX
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future<dynamic>.delayed(const Duration(milliseconds: 500));
 
     final success = widget.logman.authenticate(credential);
 
@@ -69,7 +70,8 @@ class _LogmanAuthWrapperState extends State<LogmanAuthWrapper> {
         });
       } else if (attemptsLeft > 0) {
         setState(() {
-          _errorMessage = 'Invalid ${_getCredentialTypeName()}. $attemptsLeft attempts remaining.';
+          _errorMessage =
+              'Invalid ${_getCredentialTypeName()}. $attemptsLeft attempts remaining.';
         });
       } else {
         setState(() {
@@ -106,8 +108,8 @@ class _LogmanAuthWrapperState extends State<LogmanAuthWrapper> {
           errorMessage: _errorMessage,
           isLoading: _isLoading,
           attemptsRemaining: widget.logman.attemptsRemaining,
-          lockoutTimeRemaining: widget.logman.isLockedOut 
-              ? widget.logman.remainingLockoutTime 
+          lockoutTimeRemaining: widget.logman.isLockedOut
+              ? widget.logman.remainingLockoutTime
               : null,
         );
       case LogmanAuthType.password:
@@ -120,8 +122,8 @@ class _LogmanAuthWrapperState extends State<LogmanAuthWrapper> {
           errorMessage: _errorMessage,
           isLoading: _isLoading,
           attemptsRemaining: widget.logman.attemptsRemaining,
-          lockoutTimeRemaining: widget.logman.isLockedOut 
-              ? widget.logman.remainingLockoutTime 
+          lockoutTimeRemaining: widget.logman.isLockedOut
+              ? widget.logman.remainingLockoutTime
               : null,
         );
       case LogmanAuthType.none:
@@ -132,7 +134,8 @@ class _LogmanAuthWrapperState extends State<LogmanAuthWrapper> {
   @override
   Widget build(BuildContext context) {
     // If no authentication required or user is authenticated, show the child
-    if (!widget.logman.requiresAuthentication || widget.logman.isAuthenticated) {
+    if (!widget.logman.requiresAuthentication ||
+        widget.logman.isAuthenticated) {
       return widget.child;
     }
 

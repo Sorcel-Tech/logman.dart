@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:logman/logman.dart';
 
 /// A widget that provides lazy loading for large log lists to improve performance.
-/// 
+///
 /// This widget loads logs in chunks as the user scrolls, preventing memory issues
 /// with large numbers of log records.
 class LazyLogList extends StatefulWidget {
@@ -29,12 +29,13 @@ class LazyLogList extends StatefulWidget {
 
 class _LazyLogListState extends State<LazyLogList> {
   final ScrollController _scrollController = ScrollController();
-  List<LogmanRecord> _loadedRecords = [];
+  final List<LogmanRecord> _loadedRecords = [];
   int _currentPage = 0;
   bool _hasMore = true;
   bool _isLoading = false;
 
-  ScrollController get effectiveController => widget.controller ?? _scrollController;
+  ScrollController get effectiveController =>
+      widget.controller ?? _scrollController;
 
   @override
   void initState() {
@@ -80,7 +81,8 @@ class _LazyLogListState extends State<LazyLogList> {
     Future.microtask(() {
       final allRecords = widget.records.value;
       final startIndex = _currentPage * widget.pageSize;
-      final endIndex = (startIndex + widget.pageSize).clamp(0, allRecords.length);
+      final endIndex =
+          (startIndex + widget.pageSize).clamp(0, allRecords.length);
 
       if (startIndex >= allRecords.length) {
         setState(() {
@@ -91,7 +93,7 @@ class _LazyLogListState extends State<LazyLogList> {
       }
 
       final newRecords = allRecords.sublist(startIndex, endIndex);
-      
+
       setState(() {
         _loadedRecords.addAll(newRecords);
         _currentPage++;
@@ -102,7 +104,7 @@ class _LazyLogListState extends State<LazyLogList> {
   }
 
   void _onScroll() {
-    if (effectiveController.position.pixels >= 
+    if (effectiveController.position.pixels >=
         effectiveController.position.maxScrollExtent - 200) {
       _loadMoreData();
     }
@@ -111,13 +113,13 @@ class _LazyLogListState extends State<LazyLogList> {
   @override
   Widget build(BuildContext context) {
     if (_loadedRecords.isEmpty && !_isLoading) {
-      return widget.emptyWidget ?? 
-        const Center(
-          child: Text(
-            'No logs available',
-            style: TextStyle(fontSize: 16, color: Colors.grey),
-          ),
-        );
+      return widget.emptyWidget ??
+          const Center(
+            child: Text(
+              'No logs available',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+          );
     }
 
     return ListView.builder(
@@ -192,19 +194,19 @@ class _VirtualLogListState extends State<VirtualLogList> {
   void _updateVisibleRange() {
     if (!mounted) return;
 
-    final scrollOffset = _scrollController.hasClients 
-        ? _scrollController.offset 
-        : 0.0;
-    
-    final viewportHeight = _scrollController.hasClients 
-        ? _scrollController.position.viewportDimension 
+    final scrollOffset =
+        _scrollController.hasClients ? _scrollController.offset : 0.0;
+
+    final viewportHeight = _scrollController.hasClients
+        ? _scrollController.position.viewportDimension
         : widget.itemHeight * widget.visibleItemCount;
 
     final firstIndex = (scrollOffset / widget.itemHeight).floor();
-    final lastIndex = ((scrollOffset + viewportHeight) / widget.itemHeight).ceil();
-    
+    final lastIndex =
+        ((scrollOffset + viewportHeight) / widget.itemHeight).ceil();
+
     final recordCount = widget.records.value.length;
-    
+
     setState(() {
       _firstVisibleIndex = firstIndex.clamp(0, recordCount - 1);
       _lastVisibleIndex = lastIndex.clamp(0, recordCount - 1);
@@ -214,37 +216,37 @@ class _VirtualLogListState extends State<VirtualLogList> {
   @override
   Widget build(BuildContext context) {
     final records = widget.records.value;
-    
+
     if (records.isEmpty) {
-      return widget.emptyWidget ?? 
-        const Center(
-          child: Text(
-            'No logs available',
-            style: TextStyle(fontSize: 16, color: Colors.grey),
-          ),
-        );
+      return widget.emptyWidget ??
+          const Center(
+            child: Text(
+              'No logs available',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+          );
     }
 
-    final totalHeight = records.length * widget.itemHeight;
-    
     return ValueListenableBuilder<List<LogmanRecord>>(
       valueListenable: widget.records,
       builder: (context, currentRecords, _) {
         if (currentRecords.isEmpty) {
-          return widget.emptyWidget ?? 
-            const Center(
-              child: Text(
-                'No logs available',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-            );
+          return widget.emptyWidget ??
+              const Center(
+                child: Text(
+                  'No logs available',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              );
         }
 
         // Calculate visible items with buffer
-        final buffer = 5;
-        final startIndex = (_firstVisibleIndex - buffer).clamp(0, currentRecords.length - 1);
-        final endIndex = (_lastVisibleIndex + buffer).clamp(0, currentRecords.length - 1);
-        
+        const buffer = 5;
+        final startIndex =
+            (_firstVisibleIndex - buffer).clamp(0, currentRecords.length - 1);
+        final endIndex =
+            (_lastVisibleIndex + buffer).clamp(0, currentRecords.length - 1);
+
         return CustomScrollView(
           controller: _scrollController,
           slivers: [
@@ -253,28 +255,33 @@ class _VirtualLogListState extends State<VirtualLogList> {
               SliverToBoxAdapter(
                 child: SizedBox(height: startIndex * widget.itemHeight),
               ),
-            
+
             // Visible items
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   final recordIndex = startIndex + index;
                   if (recordIndex >= currentRecords.length) return null;
-                  
+
                   return SizedBox(
                     height: widget.itemHeight,
-                    child: widget.itemBuilder(context, currentRecords[recordIndex]),
+                    child: widget.itemBuilder(
+                      context,
+                      currentRecords[recordIndex],
+                    ),
                   );
                 },
-                childCount: (endIndex - startIndex + 1).clamp(0, currentRecords.length),
+                childCount:
+                    (endIndex - startIndex + 1).clamp(0, currentRecords.length),
               ),
             ),
-            
+
             // Bottom spacer
             if (endIndex < currentRecords.length - 1)
               SliverToBoxAdapter(
                 child: SizedBox(
-                  height: (currentRecords.length - endIndex - 1) * widget.itemHeight,
+                  height: (currentRecords.length - endIndex - 1) *
+                      widget.itemHeight,
                 ),
               ),
           ],

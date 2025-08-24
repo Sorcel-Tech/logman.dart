@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:logman/logman.dart';
-import 'package:logman/src/presentation/presentation.dart';
 
 class NetworkRecordDetailsPage extends StatefulWidget {
   final NetworkLogmanRecord record;

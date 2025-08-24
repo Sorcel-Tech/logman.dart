@@ -5,8 +5,8 @@ class LogmanPinEntry extends StatefulWidget {
   final String title;
   final String subtitle;
   final int pinLength;
-  final Function(String) onPinCompleted;
-  final Function()? onCancel;
+  final void Function(String) onPinCompleted;
+  final void Function()? onCancel;
   final bool obscureText;
   final Color? primaryColor;
   final String? errorMessage;
@@ -50,10 +50,12 @@ class _LogmanPinEntryState extends State<LogmanPinEntry>
     _shakeAnimation = Tween<Offset>(
       begin: Offset.zero,
       end: const Offset(0.05, 0),
-    ).animate(CurvedAnimation(
-      parent: _shakeController,
-      curve: Curves.elasticIn,
-    ));
+    ).animate(
+      CurvedAnimation(
+        parent: _shakeController,
+        curve: Curves.elasticIn,
+      ),
+    );
   }
 
   @override
@@ -82,7 +84,8 @@ class _LogmanPinEntryState extends State<LogmanPinEntry>
   void _onBackspacePressed() {
     if (widget.isLoading || widget.lockoutTimeRemaining != null) return;
 
-    final lastFilledIndex = _pinDigits.lastIndexWhere((digit) => digit.isNotEmpty);
+    final lastFilledIndex =
+        _pinDigits.lastIndexWhere((digit) => digit.isNotEmpty);
     if (lastFilledIndex != -1) {
       setState(() {
         _pinDigits[lastFilledIndex] = '';
@@ -105,7 +108,8 @@ class _LogmanPinEntryState extends State<LogmanPinEntry>
   @override
   void didUpdateWidget(LogmanPinEntry oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.errorMessage != null && oldWidget.errorMessage != widget.errorMessage) {
+    if (widget.errorMessage != null &&
+        oldWidget.errorMessage != widget.errorMessage) {
       _triggerShakeAnimation();
       _clearPin();
     }
@@ -132,7 +136,7 @@ class _LogmanPinEntryState extends State<LogmanPinEntry>
         child: Column(
           children: [
             const SizedBox(height: 40),
-            
+
             // Header icon and subtitle
             Icon(
               Icons.lock_outline,
@@ -155,7 +159,7 @@ class _LogmanPinEntryState extends State<LogmanPinEntry>
                 margin: const EdgeInsets.only(bottom: 24),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
+                  color: Colors.red.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.red),
                 ),
@@ -179,7 +183,7 @@ class _LogmanPinEntryState extends State<LogmanPinEntry>
               ),
               const Spacer(),
             ] else ...[
-              // PIN dots display  
+              // PIN dots display
               SlideTransition(
                 position: _shakeAnimation,
                 child: Row(
@@ -220,8 +224,8 @@ class _LogmanPinEntryState extends State<LogmanPinEntry>
                 Text(
                   '${widget.attemptsRemaining} attempts remaining',
                   style: TextStyle(
-                    color: widget.attemptsRemaining <= 2 
-                        ? Colors.orange 
+                    color: widget.attemptsRemaining <= 2
+                        ? Colors.orange
                         : Colors.grey[600],
                     fontSize: 12,
                   ),
@@ -234,7 +238,7 @@ class _LogmanPinEntryState extends State<LogmanPinEntry>
               Expanded(
                 child: _buildNumberPad(primaryColor),
               ),
-              
+
               // Loading indicator
               if (widget.isLoading) ...[
                 const SizedBox(height: 16),

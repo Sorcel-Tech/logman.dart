@@ -179,7 +179,10 @@ _logman.error('API call failed',
 ### Log Level Filtering
 ```dart
 // Set minimum log level (ignores logs below this level)
-_logman.setMinLogLevel(LogLevel.warn); // Only show warnings and errors
+_logman.minimumLogLevel = LogLevel.warn; // Only show warnings and errors
+
+// Get current minimum log level
+final currentLevel = _logman.minimumLogLevel;
 
 // Get logs by level or tag
 final warningLogs = _logman.getRecordsByLevel(LogLevel.warn);
@@ -215,8 +218,8 @@ MaterialApp(
 ### Shorthand Methods
 - `v()`, `d()`, `i()`, `w()`, `e()`
 
-### Configuration Methods
-- `setMinLogLevel(LogLevel level)`
+### Properties
+- `minimumLogLevel` (getter/setter) - Get/set minimum log level
 - `configureSecurity(LogmanSecurity security)`
 - `configureBackgroundProcessing({...})`
 - `getRecordsByLevel(LogLevel level)`

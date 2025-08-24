@@ -106,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
         printLogs: true,
         security: LogmanSecurity.withPin(
           '1234',
-          sessionTimeout: Duration(minutes: 15),
+          sessionTimeout: const Duration(minutes: 15),
           maxAttempts: 3,
         ),
       );

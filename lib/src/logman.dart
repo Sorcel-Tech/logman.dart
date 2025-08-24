@@ -4,8 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 import 'package:logman/logman.dart';
-import 'package:logman/src/models/logman_security.dart';
-import 'package:logman/src/presentation/presentation.dart';
 
 /// A logging utility class for Flutter applications.
 /// It supports various types of logs including simple logs, navigation,
@@ -507,9 +505,12 @@ class Logman {
       verbose(message, tag: tag, metadata: metadata);
 
   /// Sets the minimum log level.
-  void setMinLogLevel(LogLevel level) {
+  set minimumLogLevel(LogLevel level) {
     minLogLevel = level;
   }
+
+  /// Gets the current minimum log level.
+  LogLevel get minimumLogLevel => minLogLevel;
 
   /// Gets all records filtered by log level.
   List<LogmanRecord> getRecordsByLevel(LogLevel minLevel) {
@@ -644,25 +645,12 @@ class Logman {
   bool get isLockedOut => _authAttempts?.isLockedOut ?? false;
 
   /// Gets remaining lockout time.
-  Duration get remainingLockoutTime => _authAttempts?.remainingLockoutTime ?? Duration.zero;
+  Duration get remainingLockoutTime =>
+      _authAttempts?.remainingLockoutTime ?? Duration.zero;
 
   /// Gets remaining attempts before lockout.
   int get attemptsRemaining => _authAttempts?.attemptsRemaining ?? 0;
 
   /// Gets authentication type.
   LogmanAuthType get authType => _security?.authType ?? LogmanAuthType.none;
-
-  /// Internal method to check authentication before accessing sensitive operations.
-  bool _checkAuthentication() {
-    if (!requiresAuthentication) return true;
-    
-    // Check if session is still valid
-    if (_authSession?.isValid ?? false) {
-      return true;
-    }
-    
-    // Session expired, clear it
-    _authSession = null;
-    return false;
-  }
 }

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+
 import 'package:crypto/crypto.dart';
 
 /// Enum for different authentication types
@@ -36,7 +37,7 @@ class LogmanSecurity {
   }) {
     final salt = _generateSalt();
     final hashedPin = _hashCredential(pin, salt);
-    
+
     return LogmanSecurity(
       authType: LogmanAuthType.pin,
       hashedCredential: hashedPin,
@@ -56,7 +57,7 @@ class LogmanSecurity {
   }) {
     final salt = _generateSalt();
     final hashedPassword = _hashCredential(password, salt);
-    
+
     return LogmanSecurity(
       authType: LogmanAuthType.password,
       hashedCredential: hashedPassword,
@@ -71,7 +72,7 @@ class LogmanSecurity {
   bool verifyCredential(String credential) {
     if (authType == LogmanAuthType.none) return true;
     if (hashedCredential == null || salt == null) return false;
-    
+
     final hashedInput = _hashCredential(credential, salt!);
     return hashedInput == hashedCredential;
   }
@@ -98,7 +99,7 @@ class LogmanSecurity {
 class LogmanAuthSession {
   final DateTime authenticatedAt;
   final Duration sessionTimeout;
-  
+
   LogmanAuthSession({
     required this.sessionTimeout,
   }) : authenticatedAt = DateTime.now();
@@ -146,24 +147,24 @@ class LogmanAuthAttempts {
   /// Checks if currently locked out
   bool get isLockedOut {
     if (_lockoutStartTime == null) return false;
-    
+
     final now = DateTime.now();
     final lockoutElapsed = now.difference(_lockoutStartTime!);
-    
+
     if (lockoutElapsed >= lockoutDuration) {
       // Lockout period has expired
       _lockoutStartTime = null;
       _attemptCount = 0;
       return false;
     }
-    
+
     return true;
   }
 
   /// Returns remaining lockout time
   Duration get remainingLockoutTime {
     if (_lockoutStartTime == null) return Duration.zero;
-    
+
     final elapsed = DateTime.now().difference(_lockoutStartTime!);
     final remaining = lockoutDuration - elapsed;
     return remaining.isNegative ? Duration.zero : remaining;
@@ -173,5 +174,6 @@ class LogmanAuthAttempts {
   int get attemptCount => _attemptCount;
 
   /// Returns attempts remaining before lockout
-  int get attemptsRemaining => (maxAttempts - _attemptCount).clamp(0, maxAttempts);
+  int get attemptsRemaining =>
+      (maxAttempts - _attemptCount).clamp(0, maxAttempts);
 }

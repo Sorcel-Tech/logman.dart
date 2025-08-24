@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 /// A password entry widget for Logman authentication
 class LogmanPasswordEntry extends StatefulWidget {
   final String title;
   final String subtitle;
-  final Function(String) onPasswordSubmitted;
-  final Function()? onCancel;
+  final void Function(String) onPasswordSubmitted;
+  final void Function()? onCancel;
   final Color? primaryColor;
   final String? errorMessage;
   final bool isLoading;
@@ -48,10 +47,12 @@ class _LogmanPasswordEntryState extends State<LogmanPasswordEntry>
     _shakeAnimation = Tween<Offset>(
       begin: Offset.zero,
       end: const Offset(0.05, 0),
-    ).animate(CurvedAnimation(
-      parent: _shakeController,
-      curve: Curves.elasticIn,
-    ));
+    ).animate(
+      CurvedAnimation(
+        parent: _shakeController,
+        curve: Curves.elasticIn,
+      ),
+    );
 
     // Auto-focus password field
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -71,7 +72,7 @@ class _LogmanPasswordEntryState extends State<LogmanPasswordEntry>
 
   void _submitPassword() {
     if (widget.isLoading || widget.lockoutTimeRemaining != null) return;
-    
+
     final password = _passwordController.text.trim();
     if (password.isNotEmpty) {
       widget.onPasswordSubmitted(password);
@@ -91,7 +92,8 @@ class _LogmanPasswordEntryState extends State<LogmanPasswordEntry>
   @override
   void didUpdateWidget(LogmanPasswordEntry oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.errorMessage != null && oldWidget.errorMessage != widget.errorMessage) {
+    if (widget.errorMessage != null &&
+        oldWidget.errorMessage != widget.errorMessage) {
       _triggerShakeAnimation();
       _clearPassword();
       if (widget.lockoutTimeRemaining == null) {
@@ -106,7 +108,7 @@ class _LogmanPasswordEntryState extends State<LogmanPasswordEntry>
     final primaryColor = widget.primaryColor ?? theme.primaryColor;
 
     return Scaffold(
-      backgroundColor: Colors.black.withOpacity(0.8),
+      backgroundColor: Colors.black.withValues(alpha: 0.8),
       body: Center(
         child: Container(
           margin: const EdgeInsets.all(20),
@@ -117,7 +119,7 @@ class _LogmanPasswordEntryState extends State<LogmanPasswordEntry>
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha: 0.2),
                 blurRadius: 20,
                 spreadRadius: 2,
               ),
@@ -156,15 +158,16 @@ class _LogmanPasswordEntryState extends State<LogmanPasswordEntry>
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
+                    color: Colors.red.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.red.withOpacity(0.3)),
+                    border:
+                        Border.all(color: Colors.red.withValues(alpha: 0.3)),
                   ),
                   child: Column(
                     children: [
-                      Icon(Icons.lock_clock, color: Colors.red, size: 32),
+                      const Icon(Icons.lock_clock, color: Colors.red, size: 32),
                       const SizedBox(height: 12),
-                      Text(
+                      const Text(
                         'Account Locked',
                         style: TextStyle(
                           color: Colors.red,
@@ -173,7 +176,7 @@ class _LogmanPasswordEntryState extends State<LogmanPasswordEntry>
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text(
+                      const Text(
                         'Too many failed attempts. Please try again in:',
                         style: TextStyle(color: Colors.red),
                         textAlign: TextAlign.center,
@@ -181,7 +184,7 @@ class _LogmanPasswordEntryState extends State<LogmanPasswordEntry>
                       const SizedBox(height: 8),
                       Text(
                         '${widget.lockoutTimeRemaining!.inMinutes}m ${widget.lockoutTimeRemaining!.inSeconds % 60}s',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.red,
                           fontWeight: FontWeight.bold,
                           fontSize: 20,
@@ -205,7 +208,9 @@ class _LogmanPasswordEntryState extends State<LogmanPasswordEntry>
                       prefixIcon: Icon(Icons.lock, color: primaryColor),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                          _obscurePassword
+                              ? Icons.visibility
+                              : Icons.visibility_off,
                           color: primaryColor,
                         ),
                         onPressed: () {
@@ -223,11 +228,13 @@ class _LogmanPasswordEntryState extends State<LogmanPasswordEntry>
                       ),
                       errorBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Colors.red, width: 2),
+                        borderSide:
+                            const BorderSide(color: Colors.red, width: 2),
                       ),
                       focusedErrorBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Colors.red, width: 2),
+                        borderSide:
+                            const BorderSide(color: Colors.red, width: 2),
                       ),
                     ),
                     onSubmitted: (_) => _submitPassword(),
@@ -244,13 +251,14 @@ class _LogmanPasswordEntryState extends State<LogmanPasswordEntry>
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
+                      color: Colors.red.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.red.withOpacity(0.3)),
+                      border:
+                          Border.all(color: Colors.red.withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.error, color: Colors.red, size: 20),
+                        const Icon(Icons.error, color: Colors.red, size: 20),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
@@ -267,16 +275,17 @@ class _LogmanPasswordEntryState extends State<LogmanPasswordEntry>
                 // Attempts remaining
                 if (widget.attemptsRemaining > 0) ...[
                   Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                     decoration: BoxDecoration(
-                      color: widget.attemptsRemaining <= 2 
-                          ? Colors.orange.withOpacity(0.1)
-                          : Colors.blue.withOpacity(0.1),
+                      color: widget.attemptsRemaining <= 2
+                          ? Colors.orange.withValues(alpha: 0.1)
+                          : Colors.blue.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: widget.attemptsRemaining <= 2 
-                            ? Colors.orange.withOpacity(0.3)
-                            : Colors.blue.withOpacity(0.3),
+                        color: widget.attemptsRemaining <= 2
+                            ? Colors.orange.withValues(alpha: 0.3)
+                            : Colors.blue.withValues(alpha: 0.3),
                       ),
                     ),
                     child: Row(
@@ -284,14 +293,18 @@ class _LogmanPasswordEntryState extends State<LogmanPasswordEntry>
                       children: [
                         Icon(
                           Icons.info_outline,
-                          color: widget.attemptsRemaining <= 2 ? Colors.orange : Colors.blue,
+                          color: widget.attemptsRemaining <= 2
+                              ? Colors.orange
+                              : Colors.blue,
                           size: 16,
                         ),
                         const SizedBox(width: 8),
                         Text(
                           'Attempts remaining: ${widget.attemptsRemaining}',
                           style: TextStyle(
-                            color: widget.attemptsRemaining <= 2 ? Colors.orange : Colors.blue,
+                            color: widget.attemptsRemaining <= 2
+                                ? Colors.orange
+                                : Colors.blue,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -319,7 +332,8 @@ class _LogmanPasswordEntryState extends State<LogmanPasswordEntry>
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         )
                       : const Text(
@@ -337,9 +351,10 @@ class _LogmanPasswordEntryState extends State<LogmanPasswordEntry>
               // Cancel button
               if (widget.onCancel != null)
                 TextButton(
-                  onPressed: widget.isLoading || widget.lockoutTimeRemaining != null
-                      ? null
-                      : widget.onCancel,
+                  onPressed:
+                      widget.isLoading || widget.lockoutTimeRemaining != null
+                          ? null
+                          : widget.onCancel,
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),

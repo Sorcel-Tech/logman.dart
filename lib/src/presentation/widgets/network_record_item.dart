@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:logman/logman.dart';
-import 'package:logman/src/presentation/presentation.dart';
 
 class NetworkRecordItem extends StatelessWidget {
   final NetworkLogmanRecord record;

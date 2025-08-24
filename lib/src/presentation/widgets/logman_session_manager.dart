@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:logman/logman.dart';
 
@@ -40,7 +41,7 @@ class _LogmanSessionManagerState extends State<LogmanSessionManager> {
 
   void _startSessionMonitoring() {
     _sessionTimer?.cancel();
-    
+
     if (!widget.logman.requiresAuthentication) {
       return; // No need to monitor if auth is not required
     }
@@ -54,7 +55,8 @@ class _LogmanSessionManagerState extends State<LogmanSessionManager> {
     if (!mounted) return;
 
     // Check if session has expired
-    if (widget.logman.requiresAuthentication && !widget.logman.isAuthenticated) {
+    if (widget.logman.requiresAuthentication &&
+        !widget.logman.isAuthenticated) {
       _handleSessionExpired();
     }
 
@@ -72,7 +74,7 @@ class _LogmanSessionManagerState extends State<LogmanSessionManager> {
 
   void _startLockoutTimer() {
     _lockoutTimer?.cancel();
-    
+
     final remainingTime = widget.logman.remainingLockoutTime;
     if (remainingTime > Duration.zero) {
       _lockoutTimer = Timer(remainingTime, () {
@@ -81,38 +83,6 @@ class _LogmanSessionManagerState extends State<LogmanSessionManager> {
         }
       });
     }
-  }
-
-  void _showSessionExpiredDialog() {
-    if (!mounted) return;
-
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Row(
-            children: [
-              Icon(Icons.lock_clock, color: Colors.orange),
-              SizedBox(width: 8),
-              Text('Session Expired'),
-            ],
-          ),
-          content: const Text(
-            'Your session has expired for security reasons. Please authenticate again to continue using Logman.',
-          ),
-          actions: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                // The auth wrapper will handle re-authentication
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
@@ -163,7 +133,8 @@ class _LogmanSessionInfoState extends State<LogmanSessionInfo> {
 
   @override
   Widget build(BuildContext context) {
-    if (!widget.logman.requiresAuthentication || !widget.logman.isAuthenticated) {
+    if (!widget.logman.requiresAuthentication ||
+        !widget.logman.isAuthenticated) {
       return const SizedBox.shrink();
     }
 
@@ -176,14 +147,14 @@ class _LogmanSessionInfoState extends State<LogmanSessionInfo> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: isExpiringSoon 
-            ? Colors.orange.withOpacity(0.1)
-            : Colors.green.withOpacity(0.1),
+        color: isExpiringSoon
+            ? Colors.orange.withValues(alpha: 0.1)
+            : Colors.green.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(4),
         border: Border.all(
-          color: isExpiringSoon 
-              ? Colors.orange.withOpacity(0.3)
-              : Colors.green.withOpacity(0.3),
+          color: isExpiringSoon
+              ? Colors.orange.withValues(alpha: 0.3)
+              : Colors.green.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -199,11 +170,12 @@ class _LogmanSessionInfoState extends State<LogmanSessionInfo> {
           ],
           Text(
             'Session: ${_formatDuration(remainingTime)}',
-            style: widget.textStyle ?? TextStyle(
-              fontSize: 10,
-              color: isExpiringSoon ? Colors.orange : Colors.green,
-              fontWeight: FontWeight.w500,
-            ),
+            style: widget.textStyle ??
+                TextStyle(
+                  fontSize: 10,
+                  color: isExpiringSoon ? Colors.orange : Colors.green,
+                  fontWeight: FontWeight.w500,
+                ),
           ),
         ],
       ),

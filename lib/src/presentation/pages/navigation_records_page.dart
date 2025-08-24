@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:logman/logman.dart';
-import 'package:logman/src/presentation/presentation.dart';
 
 class NavigationRecordsPage extends StatelessWidget {
   final List<LogmanRecord> records;
