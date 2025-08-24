@@ -8,7 +8,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: 3.22.0
+          flutter-version: 3.32.3
       - run: flutter --version
       - name: Dart Apply Fixes (if this fails, run `dart fix --apply` locally)
         run: dart fix --apply; git diff --exit-code
