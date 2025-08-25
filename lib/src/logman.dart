@@ -374,7 +374,10 @@ class Logman {
   ///
   /// [context] is required, the current context of the application
   /// [debugPage] is optional. You can see an example of this in the example app
-  Future<void> openDashboard(BuildContext context, {Widget? debugPage}) {
+  /// [security] is optional, configures authentication requirements
+  Future<void> openDashboard(BuildContext context, {Widget? debugPage, LogmanSecurity? security}) {
+    if (security != null) configureSecurity(security);
+    
     return LogmanDashboardPage.push(
       context,
       logman: this,
