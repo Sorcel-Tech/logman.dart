@@ -44,6 +44,8 @@ class _LogmanAuthWrapperState extends State<LogmanAuthWrapper> {
       return;
     }
 
+    if (!mounted) return;
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -51,6 +53,8 @@ class _LogmanAuthWrapperState extends State<LogmanAuthWrapper> {
 
     // Simulate network delay for better UX
     await Future<dynamic>.delayed(const Duration(milliseconds: 500));
+
+    if (!mounted) return;
 
     final success = widget.logman.authenticate(credential);
 
@@ -60,9 +64,10 @@ class _LogmanAuthWrapperState extends State<LogmanAuthWrapper> {
 
     if (success) {
       // Authentication successful - the widget will rebuild and show child
-      setState(() {});
+      if (mounted) setState(() {});
     } else {
       // Authentication failed
+      if (!mounted) return;
       final attemptsLeft = widget.logman.attemptsRemaining;
       if (widget.logman.isLockedOut) {
         setState(() {

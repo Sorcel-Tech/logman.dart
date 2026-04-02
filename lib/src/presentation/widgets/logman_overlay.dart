@@ -9,7 +9,7 @@ class LogmanOverlay extends StatelessWidget {
   final Widget? button;
   final Widget? debugPage;
   final Logman logman;
-  static late OverlayEntry _overlayEntry;
+  static OverlayEntry? _overlayEntry;
 
   const LogmanOverlay._({
     this.button,
@@ -23,6 +23,9 @@ class LogmanOverlay extends StatelessWidget {
     Widget? button,
     Widget? debugPage,
   }) {
+    // Remove any existing overlay before attaching a new one
+    removeOverlay();
+
     final overlay = Overlay.of(context);
 
     _overlayEntry = OverlayEntry(
@@ -33,11 +36,12 @@ class LogmanOverlay extends StatelessWidget {
       ),
     );
 
-    overlay.insert(_overlayEntry);
+    overlay.insert(_overlayEntry!);
   }
 
   static void removeOverlay() {
-    _overlayEntry.remove();
+    _overlayEntry?.remove();
+    _overlayEntry = null;
   }
 
   @override

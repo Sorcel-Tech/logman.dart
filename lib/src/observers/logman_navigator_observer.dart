@@ -41,9 +41,10 @@ class LogmanNavigatorObserver extends NavigatorObserver {
   @override
   void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
     super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
+    if (newRoute == null) return;
     Logman.instance.navigation(
       NavigationLogmanRecord(
-        route: newRoute!,
+        route: newRoute,
         action: NavigationAction.replace,
         previousRoute: oldRoute,
       ),

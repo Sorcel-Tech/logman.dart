@@ -56,6 +56,7 @@ class _LazyLogListState extends State<LazyLogList> {
   }
 
   void _onRecordsChanged() {
+    if (!mounted) return;
     // Reset when records change
     setState(() {
       _currentPage = 0;
@@ -79,10 +80,10 @@ class _LazyLogListState extends State<LazyLogList> {
 
     // Simulate async loading (in real scenario, this could be from a database)
     Future.microtask(() {
+      if (!mounted) return;
+
       final allRecords = widget.records.value;
       final startIndex = _currentPage * widget.pageSize;
-      final endIndex =
-          (startIndex + widget.pageSize).clamp(0, allRecords.length);
 
       if (startIndex >= allRecords.length) {
         setState(() {
@@ -92,9 +93,20 @@ class _LazyLogListState extends State<LazyLogList> {
         return;
       }
 
+      final endIndex =
+          (startIndex + widget.pageSize).clamp(startIndex, allRecords.length);
       final newRecords = allRecords.sublist(startIndex, endIndex);
 
       setState(() {
+        // Cap the loaded records to prevent unbounded memory growth.
+        // Keep a sliding window of the most recent pages.
+        const maxLoadedPages = 20;
+        final maxLoadedRecords = maxLoadedPages * widget.pageSize;
+        if (_loadedRecords.length + newRecords.length > maxLoadedRecords) {
+          final excess =
+              _loadedRecords.length + newRecords.length - maxLoadedRecords;
+          _loadedRecords.removeRange(0, excess);
+        }
         _loadedRecords.addAll(newRecords);
         _currentPage++;
         _hasMore = endIndex < allRecords.length;

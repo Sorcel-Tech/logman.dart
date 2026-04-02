@@ -66,10 +66,6 @@ class _LogmanDashboardPageState extends State<LogmanDashboardPage>
   @override
   void dispose() {
     _tabController.dispose();
-    // Auto-logout when dashboard is closed
-    if (widget.logman.requiresAuthentication && widget.logman.isAuthenticated) {
-      widget.logman.logout();
-    }
     super.dispose();
   }
 
@@ -140,14 +136,14 @@ class _LogmanDashboardPageState extends State<LogmanDashboardPage>
         valueListenable: widget.logman.records,
         builder: (context, records, _) {
           // Reverse the list to show the latest records first
-          records = records.reversed.toList();
+          final reversedRecords = records.reversed.toList();
           return TabBarView(
             controller: _tabController,
             children: [
-              AllRecordsPage(records: records),
-              SimpleRecordsPage(records: records),
+              AllRecordsPage(records: reversedRecords),
+              SimpleRecordsPage(records: reversedRecords),
               NetworkRecordsPage(networkRecordNotifier: _recordNotifier),
-              NavigationRecordsPage(records: records),
+              NavigationRecordsPage(records: reversedRecords),
               if (widget.debugPage != null) widget.debugPage!,
             ],
           );

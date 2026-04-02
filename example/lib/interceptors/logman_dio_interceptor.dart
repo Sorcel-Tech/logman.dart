@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:logman/logman.dart';
 
 class LogmanDioInterceptor extends Interceptor {
@@ -10,10 +9,12 @@ class LogmanDioInterceptor extends Interceptor {
   LogmanDioInterceptor();
 
   final _cache = <RequestOptions, String>{};
+  int _requestCounter = 0;
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    final requestId = UniqueKey().hashCode.toRadixString(16);
+    final requestId =
+        '${DateTime.now().millisecondsSinceEpoch}_${_requestCounter++}';
     _cache[options] = requestId;
     final sentAt = DateTime.now();
 
@@ -35,11 +36,14 @@ class LogmanDioInterceptor extends Interceptor {
     final Map<String, String> responseHeaders = response.headers.map.map(
       (key, value) => MapEntry(key, value.join(', ')),
     );
-    final id = _cache[response.requestOptions];
+    final id = _cache.remove(response.requestOptions);
+    if (id == null) {
+      return super.onResponse(response, handler);
+    }
     final receivedAt = DateTime.now();
 
     final responseRecord = NetworkResponseLogmanRecord(
-      id: id!,
+      id: id,
       statusCode: response.statusCode,
       headers: responseHeaders,
       body: dataToString(response.data),
@@ -57,10 +61,13 @@ class LogmanDioInterceptor extends Interceptor {
     final Map<String, String>? responseHeaders = err.response?.headers.map.map(
       (key, value) => MapEntry(key, value.join(', ')),
     );
-    final id = _cache[err.requestOptions];
+    final id = _cache.remove(err.requestOptions);
+    if (id == null) {
+      return super.onError(err, handler);
+    }
 
     final responseRecord = NetworkResponseLogmanRecord(
-      id: id!,
+      id: id,
       statusCode: err.response?.statusCode ?? 0,
       headers: responseHeaders,
       body: dataToString(err.response?.data),
@@ -74,14 +81,14 @@ class LogmanDioInterceptor extends Interceptor {
   }
 
   String dataToString(dynamic data) {
+    if (data == null) return '';
     if (data is Map) {
       return jsonEncode(data);
     } else if (data is List) {
       return jsonEncode(data);
+    } else if (data is FormData) {
+      return readFormData(data);
     } else {
-      if (data is FormData) {
-        return readFormData(data);
-      }
       return data.toString();
     }
   }

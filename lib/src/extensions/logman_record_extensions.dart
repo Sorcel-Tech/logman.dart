@@ -4,16 +4,19 @@ import 'package:logman/logman.dart';
 
 extension NetworkLogmanRecordExtensions on NetworkLogmanRecord {
   String get durationInMs {
-    if (request.sentAt == null || response?.receivedAt == null) {
+    final sentAt = request.sentAt;
+    final receivedAt = response?.receivedAt;
+    if (sentAt == null || receivedAt == null) {
       return '0 ms';
     }
-    return '${response?.receivedAt!.difference(request.sentAt!).inMilliseconds} ms';
+    return '${receivedAt.difference(sentAt).inMilliseconds} ms';
   }
 }
 
 extension NetworkResponseLogmanRecordExtensions on NetworkResponseLogmanRecord {
   String get sizeInBytes {
-    final encoded = utf8.encode(body.toString());
+    if (body == null) return '0 bytes';
+    final encoded = utf8.encode(body!);
     return '${encoded.length} bytes';
   }
 }

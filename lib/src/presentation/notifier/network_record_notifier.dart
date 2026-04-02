@@ -31,7 +31,7 @@ class NetworkRecordNotifier extends ValueNotifier<List<NetworkLogmanRecord>> {
 
   bool _isErrorStatusCode(NetworkLogmanRecord record) {
     final statusCode = record.response?.statusCode;
-    return statusCode != null && (statusCode >= 400 && statusCode <= 500) ||
-        statusCode == 0;
+    if (statusCode == null) return false;
+    return statusCode >= 400 || statusCode == 0;
   }
 }
