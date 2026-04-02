@@ -22,7 +22,7 @@ class LogmanDashboardPage extends StatefulWidget {
           logman: logman,
           onSessionExpired: () {
             // Auto-close dashboard when session expires
-            Navigator.of(_).pop();
+            Navigator.of(context).pop();
           },
           child: withLogmanAuth(
             logman: logman,
