@@ -28,9 +28,9 @@ void main() {
       );
 
       final json = record.toJson();
-      expect(json['request'], isA<Map>());
-      expect(json['request']['url'], 'https://example.com');
-      expect(json['request']['method'], 'POST');
+      final request = json['request'] as Map<String, dynamic>;
+      expect(request['url'], 'https://example.com');
+      expect(request['method'], 'POST');
       expect(json['response'], isNull);
     });
 
