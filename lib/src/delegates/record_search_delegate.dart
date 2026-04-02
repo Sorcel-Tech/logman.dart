@@ -4,6 +4,10 @@ import 'package:logman/logman.dart';
 class RecordSearchDelegate extends SearchDelegate<LogmanRecord> {
   final List<LogmanRecord> records;
 
+  /// Cached search results to avoid duplicate computation.
+  String _lastQuery = '';
+  List<LogmanRecord> _cachedResults = [];
+
   RecordSearchDelegate({
     super.searchFieldLabel,
     super.searchFieldStyle,
@@ -33,16 +37,24 @@ class RecordSearchDelegate extends SearchDelegate<LogmanRecord> {
     );
   }
 
+  List<LogmanRecord> _getCachedResults() {
+    if (query != _lastQuery) {
+      _lastQuery = query;
+      _cachedResults = _likeSearch(records);
+    }
+    return _cachedResults;
+  }
+
   @override
   Widget buildResults(BuildContext context) {
-    final searchRecords = _likeSearch(records);
+    final searchRecords = _getCachedResults();
 
     return _searchRecordListView(searchRecords);
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    final searchRecords = _likeSearch(records);
+    final searchRecords = _getCachedResults();
 
     if (searchRecords.isEmpty) {
       return const Center(
@@ -62,6 +74,7 @@ class RecordSearchDelegate extends SearchDelegate<LogmanRecord> {
 
   Widget _searchRecordListView(List<LogmanRecord> searchRecords) {
     return ListView.separated(
+      reverse: true,
       itemCount: searchRecords.length,
       itemBuilder: (context, index) {
         final record = searchRecords[index];

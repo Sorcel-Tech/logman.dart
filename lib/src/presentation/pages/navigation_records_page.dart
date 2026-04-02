@@ -22,6 +22,7 @@ class NavigationRecordsPage extends StatelessWidget {
     }
 
     return ListView.separated(
+      reverse: true,
       itemCount: navigationRecords.length,
       itemBuilder: (context, index) {
         final record = navigationRecords[index] as NavigationLogmanRecord;

@@ -30,6 +30,6 @@ class NavigationLogmanRecord extends LogmanRecord {
 
   @override
   String toString() {
-    return 'NavigationLogmanRecord{route: $routeName, action: $action, previousRoute: $previousRoute, parameters: $parameters}';
+    return 'NavigationLogmanRecord{route: $routeName, action: $action, previousRoute: $previousRouteName, parameters: $parameters}';
   }
 }

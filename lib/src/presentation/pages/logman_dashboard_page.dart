@@ -22,7 +22,7 @@ class LogmanDashboardPage extends StatefulWidget {
           logman: logman,
           onSessionExpired: () {
             // Auto-close dashboard when session expires
-            Navigator.of(_).pop();
+            Navigator.of(context).pop();
           },
           child: withLogmanAuth(
             logman: logman,
@@ -66,10 +66,6 @@ class _LogmanDashboardPageState extends State<LogmanDashboardPage>
   @override
   void dispose() {
     _tabController.dispose();
-    // Auto-logout when dashboard is closed
-    if (widget.logman.requiresAuthentication && widget.logman.isAuthenticated) {
-      widget.logman.logout();
-    }
     super.dispose();
   }
 
@@ -117,7 +113,7 @@ class _LogmanDashboardPageState extends State<LogmanDashboardPage>
             onPressed: () => showSearch(
               context: context,
               delegate: RecordSearchDelegate(
-                records: widget.logman.records.value.reversed.toList(),
+                records: widget.logman.records.value,
               ),
             ),
             icon: const Icon(Icons.search_rounded),
@@ -139,8 +135,6 @@ class _LogmanDashboardPageState extends State<LogmanDashboardPage>
       body: ValueListenableBuilder(
         valueListenable: widget.logman.records,
         builder: (context, records, _) {
-          // Reverse the list to show the latest records first
-          records = records.reversed.toList();
           return TabBarView(
             controller: _tabController,
             children: [

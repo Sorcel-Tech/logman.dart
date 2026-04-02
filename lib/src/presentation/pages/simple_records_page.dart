@@ -31,6 +31,7 @@ class _SimpleRecordsPageState extends State<SimpleRecordsPage> {
   Widget build(BuildContext context) {
     return LazyLogList(
       records: _recordsNotifier,
+      reverse: true,
       pageSize: 25, // Load 25 items at a time for better performance
       itemBuilder: (context, record) {
         return Column(

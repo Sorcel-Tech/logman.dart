@@ -20,7 +20,7 @@ class NetworkLogmanRecord extends LogmanRecord {
 
   @override
   String toString() {
-    return 'NetworkRequestLogmanRecord(request: $request, response: $response)';
+    return 'NetworkLogmanRecord(request: $request, response: $response)';
   }
 
   Map<String, dynamic> toJson() {
@@ -43,7 +43,7 @@ class NetworkRequestLogmanRecord {
     required this.id,
     required this.url,
     required this.method,
-    required this.headers,
+    this.headers,
     this.body,
     this.sentAt,
   });
@@ -81,9 +81,9 @@ class NetworkResponseLogmanRecord {
 
   NetworkResponseLogmanRecord({
     required this.id,
-    required this.statusCode,
-    required this.headers,
-    required this.body,
+    this.statusCode,
+    this.headers,
+    this.body,
     this.receivedAt,
     required this.url,
   });

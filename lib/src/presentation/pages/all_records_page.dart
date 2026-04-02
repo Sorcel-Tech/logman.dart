@@ -14,6 +14,7 @@ class AllRecordsPage extends StatelessWidget {
     }
 
     return ListView.separated(
+      reverse: true,
       itemCount: records.length,
       itemBuilder: (context, index) {
         final record = records[index];

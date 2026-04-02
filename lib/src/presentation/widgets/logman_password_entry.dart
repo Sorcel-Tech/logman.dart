@@ -76,6 +76,7 @@ class _LogmanPasswordEntryState extends State<LogmanPasswordEntry>
     final password = _passwordController.text.trim();
     if (password.isNotEmpty) {
       widget.onPasswordSubmitted(password);
+      _passwordController.clear();
     }
   }
 
