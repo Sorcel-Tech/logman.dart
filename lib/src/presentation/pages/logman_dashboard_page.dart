@@ -113,7 +113,7 @@ class _LogmanDashboardPageState extends State<LogmanDashboardPage>
             onPressed: () => showSearch(
               context: context,
               delegate: RecordSearchDelegate(
-                records: widget.logman.records.value.reversed.toList(),
+                records: widget.logman.records.value,
               ),
             ),
             icon: const Icon(Icons.search_rounded),
@@ -135,15 +135,13 @@ class _LogmanDashboardPageState extends State<LogmanDashboardPage>
       body: ValueListenableBuilder(
         valueListenable: widget.logman.records,
         builder: (context, records, _) {
-          // Reverse the list to show the latest records first
-          final reversedRecords = records.reversed.toList();
           return TabBarView(
             controller: _tabController,
             children: [
-              AllRecordsPage(records: reversedRecords),
-              SimpleRecordsPage(records: reversedRecords),
+              AllRecordsPage(records: records),
+              SimpleRecordsPage(records: records),
               NetworkRecordsPage(networkRecordNotifier: _recordNotifier),
-              NavigationRecordsPage(records: reversedRecords),
+              NavigationRecordsPage(records: records),
               if (widget.debugPage != null) widget.debugPage!,
             ],
           );

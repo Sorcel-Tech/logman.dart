@@ -13,6 +13,14 @@ class LazyLogList extends StatefulWidget {
   final EdgeInsets? padding;
   final ScrollController? controller;
 
+  /// Maximum number of records to keep loaded in memory.
+  /// Once reached, no further pages are loaded until a full reset occurs.
+  /// Defaults to 1000.
+  final int maxLoadedRecords;
+
+  /// Whether to display items in reverse order (latest first).
+  final bool reverse;
+
   const LazyLogList({
     super.key,
     required this.records,
@@ -21,6 +29,8 @@ class LazyLogList extends StatefulWidget {
     this.emptyWidget,
     this.padding,
     this.controller,
+    this.maxLoadedRecords = 1000,
+    this.reverse = false,
   });
 
   @override
@@ -33,6 +43,10 @@ class _LazyLogListState extends State<LazyLogList> {
   int _currentPage = 0;
   bool _hasMore = true;
   bool _isLoading = false;
+
+  /// Track the total record count from the last update to detect
+  /// appends vs full resets (e.g. filters, clears).
+  int _previousRecordCount = 0;
 
   ScrollController get effectiveController =>
       widget.controller ?? _scrollController;
@@ -57,7 +71,37 @@ class _LazyLogListState extends State<LazyLogList> {
 
   void _onRecordsChanged() {
     if (!mounted) return;
-    // Reset when records change
+
+    final allRecords = widget.records.value;
+    final newCount = allRecords.length;
+
+    // Case 1: New records were appended (most common during active logging).
+    // Append only the new entries to _loadedRecords, preserving scroll position.
+    if (newCount > _previousRecordCount && _previousRecordCount > 0) {
+      // Only auto-append if the user has already scrolled through all
+      // previously loaded pages (i.e. they're near the end). Otherwise
+      // just update _hasMore so they can scroll to fetch them.
+      if (!_hasMore) {
+        final newEntries = allRecords.sublist(_previousRecordCount);
+        setState(() {
+          _loadedRecords.addAll(newEntries);
+          _hasMore = false;
+        });
+        // Recalculate the current page to stay in sync.
+        _currentPage = (_loadedRecords.length / widget.pageSize).ceil();
+      } else {
+        // More pages still to load — just note that there's still more.
+        setState(() {
+          _hasMore = true;
+        });
+      }
+      _previousRecordCount = newCount;
+      return;
+    }
+
+    // Case 2: Records were removed, filtered, or fully replaced.
+    // A full reset is necessary.
+    _previousRecordCount = newCount;
     setState(() {
       _currentPage = 0;
       _loadedRecords.clear();
@@ -68,6 +112,7 @@ class _LazyLogListState extends State<LazyLogList> {
 
   void _loadInitialData() {
     if (_isLoading) return;
+    _previousRecordCount = widget.records.value.length;
     _loadMoreData();
   }
 
@@ -78,9 +123,19 @@ class _LazyLogListState extends State<LazyLogList> {
       _isLoading = true;
     });
 
-    // Simulate async loading (in real scenario, this could be from a database)
     Future.microtask(() {
       if (!mounted) return;
+
+      // If we've already loaded the maximum allowed records, stop loading
+      // more to prevent unbounded memory growth. The user can still see
+      // everything loaded so far without any index-shifting jumps.
+      if (_loadedRecords.length >= widget.maxLoadedRecords) {
+        setState(() {
+          _hasMore = false;
+          _isLoading = false;
+        });
+        return;
+      }
 
       final allRecords = widget.records.value;
       final startIndex = _currentPage * widget.pageSize;
@@ -98,15 +153,6 @@ class _LazyLogListState extends State<LazyLogList> {
       final newRecords = allRecords.sublist(startIndex, endIndex);
 
       setState(() {
-        // Cap the loaded records to prevent unbounded memory growth.
-        // Keep a sliding window of the most recent pages.
-        const maxLoadedPages = 20;
-        final maxLoadedRecords = maxLoadedPages * widget.pageSize;
-        if (_loadedRecords.length + newRecords.length > maxLoadedRecords) {
-          final excess =
-              _loadedRecords.length + newRecords.length - maxLoadedRecords;
-          _loadedRecords.removeRange(0, excess);
-        }
         _loadedRecords.addAll(newRecords);
         _currentPage++;
         _hasMore = endIndex < allRecords.length;
@@ -136,6 +182,7 @@ class _LazyLogListState extends State<LazyLogList> {
 
     return ListView.builder(
       controller: effectiveController,
+      reverse: widget.reverse,
       padding: widget.padding,
       itemCount: _loadedRecords.length + (_hasMore ? 1 : 0),
       itemBuilder: (context, index) {

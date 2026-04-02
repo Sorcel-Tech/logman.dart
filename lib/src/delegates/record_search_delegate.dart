@@ -74,6 +74,7 @@ class RecordSearchDelegate extends SearchDelegate<LogmanRecord> {
 
   Widget _searchRecordListView(List<LogmanRecord> searchRecords) {
     return ListView.separated(
+      reverse: true,
       itemCount: searchRecords.length,
       itemBuilder: (context, index) {
         final record = searchRecords[index];
