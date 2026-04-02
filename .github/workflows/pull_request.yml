@@ -10,12 +10,12 @@ jobs:
           channel: stable
           flutter-version: 3.41.1
       - run: flutter --version
+      - name: Restore packages
+        run: flutter pub get
       - name: Dart Apply Fixes (if this fails, run `dart fix --apply` locally)
         run: dart fix --apply; git diff --exit-code
       - name: Dart Formatter (if this fails, run `dart format .` locally)
         run: dart format .; git diff --exit-code
-      - name: Restore packages
-        run: flutter pub get
       - name: Analyze
         run: flutter analyze
       - name: Test
